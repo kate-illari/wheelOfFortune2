@@ -2351,7 +2351,7 @@ function spacePressHandler(event) {
             openCloseButton.onForseClosed();
             wheel.start();
             document.removeEventListener("keypress", spacePressHandler);
-
+            document.removeEventListener("touchend", spacePressHandler);
             wheel.setStoppingAngle(sectorToStopOn);
             wheel.startStopping().then(function () {
                 wheel.playGiftAnimation(itemsList[sectorToStopOn].name, function () {
@@ -2363,6 +2363,7 @@ function spacePressHandler(event) {
 }
 
 document.addEventListener("keypress", spacePressHandler);
+document.addEventListener("touchend", spacePressHandler);
 
 
 /***/ }),
