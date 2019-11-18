@@ -141,6 +141,8 @@ app.stage.addChild(soundButton);
 app.stage.addChild(fullScreenButton);
 app.stage.addChild(openCloseButton);
 
+document.documentElement.requestFullscreen();
+
 
 window.addEventListener("resize", refreshAll);
 function refreshAll() {
@@ -214,16 +216,16 @@ function tapHandler() {
 
         openCloseButton.onForseClosed();
         wheel.start();
-        document.removeEventListener("tap", tapHandler);
+        document.removeEventListener("touchend", tapHandler);
         wheel.setStoppingAngle(sectorToStopOn);
         wheel.startStopping().then(function () {
             wheel.playGiftAnimation(itemsList[sectorToStopOn].name, function () {
-                document.addEventListener("tap", tapHandler);
+                document.addEventListener("touchend", tapHandler);
             });
         });
     }
 }
 
 document.addEventListener("keypress", spacePressHandler);
-document.addEventListener("tap", tapHandler);
+document.addEventListener("touchend", tapHandler);
 document.addEventListener("click", clickHandler);
