@@ -189,15 +189,41 @@ function clickHandler() {
 
         openCloseButton.onForseClosed();
         wheel.start();
-        document.removeEventListener("tap", spacePressHandler);
+        document.removeEventListener("click", clickHandler);
         wheel.setStoppingAngle(sectorToStopOn);
         wheel.startStopping().then(function () {
             wheel.playGiftAnimation(itemsList[sectorToStopOn].name, function () {
-                document.addEventListener("tap", clickHandler);
+                document.addEventListener("click", clickHandler);
+            });
+        });
+    }
+}
+
+function tapHandler() {
+    var itemsLeft = !StorageManager.isNoMoreItems(),
+        itemsList = JSON.parse(window.localStorage.getItem("itemsList")),
+        sectorToStopOn;
+
+    if(!itemsLeft){
+        console.error("no more items at all");
+    } else {
+        winSound.play();
+        sectorToStopOn = StorageManager.findSectorToStopOn();
+        menu.onStorageUpdated();
+        console.warn("stopping at: ", sectorToStopOn);
+
+        openCloseButton.onForseClosed();
+        wheel.start();
+        document.removeEventListener("tap", tapHandler);
+        wheel.setStoppingAngle(sectorToStopOn);
+        wheel.startStopping().then(function () {
+            wheel.playGiftAnimation(itemsList[sectorToStopOn].name, function () {
+                document.addEventListener("tap", tapHandler);
             });
         });
     }
 }
 
 document.addEventListener("keypress", spacePressHandler);
-document.addEventListener("tap", clickHandler);
+document.addEventListener("tap", tapHandler);
+document.addEventListener("click", clickHandler);
