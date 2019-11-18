@@ -2377,12 +2377,10 @@ function clickHandler() {
         openCloseButton.onForseClosed();
         wheel.start();
         document.removeEventListener("tap", spacePressHandler);
-        document.removeEventListener("click", spacePressHandler);
         wheel.setStoppingAngle(sectorToStopOn);
         wheel.startStopping().then(function () {
             wheel.playGiftAnimation(itemsList[sectorToStopOn].name, function () {
                 document.addEventListener("tap", clickHandler);
-                document.addEventListener("click", clickHandler);
             });
         });
     }
@@ -2390,7 +2388,6 @@ function clickHandler() {
 
 document.addEventListener("keypress", spacePressHandler);
 document.addEventListener("tap", clickHandler);
-document.addEventListener("click", clickHandler);
 
 
 /***/ }),
