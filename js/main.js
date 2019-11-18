@@ -164,7 +164,6 @@ function spacePressHandler(event) {
             openCloseButton.onForseClosed();
             wheel.start();
             document.removeEventListener("keypress", spacePressHandler);
-            document.removeEventListener("touchend", spacePressHandler);
             wheel.setStoppingAngle(sectorToStopOn);
             wheel.startStopping().then(function () {
                 wheel.playGiftAnimation(itemsList[sectorToStopOn].name, function () {
@@ -175,5 +174,30 @@ function spacePressHandler(event) {
     }
 }
 
+function clickHandler() {
+    var itemsLeft = !StorageManager.isNoMoreItems(),
+        itemsList = JSON.parse(window.localStorage.getItem("itemsList")),
+        sectorToStopOn;
+
+    if(!itemsLeft){
+        console.error("no more items at all");
+    } else {
+        winSound.play();
+        sectorToStopOn = StorageManager.findSectorToStopOn();
+        menu.onStorageUpdated();
+        console.warn("stopping at: ", sectorToStopOn);
+
+        openCloseButton.onForseClosed();
+        wheel.start();
+        document.removeEventListener("tap", spacePressHandler);
+        wheel.setStoppingAngle(sectorToStopOn);
+        wheel.startStopping().then(function () {
+            wheel.playGiftAnimation(itemsList[sectorToStopOn].name, function () {
+                document.addEventListener("tap", clickHandler);
+            });
+        });
+    }
+}
+
 document.addEventListener("keypress", spacePressHandler);
-document.addEventListener("touchend", spacePressHandler);
+document.addEventListener("tap", clickHandler);
