@@ -14,16 +14,6 @@ document.body.appendChild(app.view);
 var ambientSound = new Audio("assets/sounds/ambient.mp3");
 var winSound = new Audio("assets/sounds/AUTOMOBILE.mp3");
 
-function startAmbient() {
-    ambientSound.volume = 0.5;
-    ambientSound.play();
-    ambientSound.loop = true;
-}
-
-ambientSound.addEventListener("loadeddata", () => {
-    startAmbient();
-});
-
 const soundButton = new SoundButton({
     soundOn: function () {
         ambientSound.volume = 0.5;
@@ -37,10 +27,10 @@ const soundButton = new SoundButton({
 
 const fullScreenButton = new FullScreenButton({
     enterFullscreenMode: function () {
-        document.documentElement.requestFullscreen();
+        document.documentElement.webkitRequestFullscreen();
     },
     exitFullscreenMode: function () {
-        document.exitFullscreen();
+        document.webkitExitFullscreen();
     }
 });
 
@@ -141,7 +131,7 @@ app.stage.addChild(soundButton);
 app.stage.addChild(fullScreenButton);
 app.stage.addChild(openCloseButton);
 
-document.documentElement.requestFullscreen();
+document.documentElement.webkitRequestFullscreen();
 
 
 window.addEventListener("resize", refreshAll);
@@ -150,6 +140,7 @@ function refreshAll() {
 }
 
 function spacePressHandler(event) {
+    console.warn("spacePressHandler");
     if(event.keyCode === 32){
         var itemsLeft = !StorageManager.isNoMoreItems(),
             itemsList = JSON.parse(window.localStorage.getItem("itemsList")),
@@ -177,6 +168,7 @@ function spacePressHandler(event) {
 }
 
 function clickHandler() {
+    console.warn("clickHandler");
     var itemsLeft = !StorageManager.isNoMoreItems(),
         itemsList = JSON.parse(window.localStorage.getItem("itemsList")),
         sectorToStopOn;
@@ -202,6 +194,7 @@ function clickHandler() {
 }
 
 function tapHandler() {
+    console.error("touchstart");
     var itemsLeft = !StorageManager.isNoMoreItems(),
         itemsList = JSON.parse(window.localStorage.getItem("itemsList")),
         sectorToStopOn;
