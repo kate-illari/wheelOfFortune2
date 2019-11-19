@@ -216,16 +216,16 @@ function tapHandler() {
 
         openCloseButton.onForseClosed();
         wheel.start();
-        document.removeEventListener("touchend", tapHandler);
+        document.removeEventListener("touchstart", tapHandler);
         wheel.setStoppingAngle(sectorToStopOn);
         wheel.startStopping().then(function () {
             wheel.playGiftAnimation(itemsList[sectorToStopOn].name, function () {
-                document.addEventListener("touchend", tapHandler);
+                document.addEventListener("touchstart", tapHandler);
             });
         });
     }
 }
 
 document.addEventListener("keypress", spacePressHandler);
-document.addEventListener("touchend", tapHandler);
+document.addEventListener("touchstart", tapHandler);
 document.addEventListener("click", clickHandler);
