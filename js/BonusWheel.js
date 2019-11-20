@@ -1,5 +1,6 @@
 import {BonusWheelItem} from "./BonusWheelItem";
 import {AnimationHolder} from "./AnimationHolder";
+import {StorageManager} from "./StorageItemsManager";
 
 const CIRCLE_DEG = 360;
     //the minimum difference (angle) between current wheel stop and previous wheel stop:
@@ -36,6 +37,7 @@ export class BonusWheel extends PIXI.Container {
         me.minSpeed = config.minSpeed;
 
         me.sprite = me._initWheelSprite(me, "wheelWin");
+        me.spinButton = me.initSpinButton(me);
         me.wheelItems = me._initWheelItems(me.sprite);
 
         //will be added to a separate spine slot:
@@ -89,6 +91,46 @@ export class BonusWheel extends PIXI.Container {
         var sprite = new PIXI.Sprite.fromImage("assets/images/"+imageName+".png");
         sprite.anchor.set(0.5, 0.5);
         container.addChild(sprite);
+
+        return sprite;
+    }
+
+    initSpinButton (wheel) {
+        var sprite = new PIXI.Sprite.fromImage("assets/images/stop_idle.png");
+        sprite.interactive = true;
+        sprite.anchor.set(0.5, 0.5);
+        wheel.addChild(sprite);
+
+        sprite.on("touchstart", function () {
+            sprite.texture = PIXI.Texture.fromImage("assets/images/stop_click.png");
+            setTimeout(function () {
+                sprite.texture = PIXI.Texture.fromImage("assets/images/stop_idle.png");
+            }, 100);
+            var itemsLeft = !StorageManager.isNoMoreItems(),
+                itemsList = JSON.parse(window.localStorage.getItem("itemsList")),
+                winSound = new Audio("assets/sounds/AUTOMOBILE.mp3"),
+                sectorToStopOn;
+
+            if(!itemsLeft){
+                console.error("no more items at all");
+            } else {
+                sprite.interactive = false;
+                winSound.play();
+                sectorToStopOn = StorageManager.findSectorToStopOn();
+                console.warn("stopping at: ", sectorToStopOn);
+
+                wheel.start();
+                wheel.setStoppingAngle(sectorToStopOn);
+                wheel.startStopping().then(function () {
+                    wheel.playGiftAnimation(itemsList[sectorToStopOn].name, function () {
+                        sprite.interactive = true;
+                    });
+                });
+            }
+        });
+        sprite.on("touchend", function () {
+            sprite.texture = PIXI.Texture.fromImage("assets/images/stop_idle.png");
+        });
 
         return sprite;
     }

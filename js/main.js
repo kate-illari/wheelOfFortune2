@@ -59,7 +59,7 @@ var wheel = new BonusWheel({
     sectorItemsList: StorageManager.getSectorItemsList(),
     image: "SYM0"
 }, function () {
-    console.log("onStartBounceCompleteCallback");
+    menu.onStorageUpdated();
 }, app);
 
 // move the sprite to the center of the screen
@@ -138,87 +138,3 @@ window.addEventListener("resize", refreshAll);
 function refreshAll() {
     wheel.refresh();
 }
-
-function spacePressHandler(event) {
-    console.warn("spacePressHandler");
-    if(event.keyCode === 32){
-        var itemsLeft = !StorageManager.isNoMoreItems(),
-            itemsList = JSON.parse(window.localStorage.getItem("itemsList")),
-            sectorToStopOn;
-
-        if(!itemsLeft){
-            console.error("no more items at all");
-        } else {
-            winSound.play();
-            sectorToStopOn = StorageManager.findSectorToStopOn();
-            menu.onStorageUpdated();
-            console.warn("stopping at: ", sectorToStopOn);
-
-            openCloseButton.onForseClosed();
-            wheel.start();
-            document.removeEventListener("keypress", spacePressHandler);
-            wheel.setStoppingAngle(sectorToStopOn);
-            wheel.startStopping().then(function () {
-                wheel.playGiftAnimation(itemsList[sectorToStopOn].name, function () {
-                    document.addEventListener("keypress", spacePressHandler);
-                });
-            });
-        }
-    }
-}
-
-function clickHandler() {
-    console.warn("clickHandler");
-    var itemsLeft = !StorageManager.isNoMoreItems(),
-        itemsList = JSON.parse(window.localStorage.getItem("itemsList")),
-        sectorToStopOn;
-
-    if(!itemsLeft){
-        console.error("no more items at all");
-    } else {
-        winSound.play();
-        sectorToStopOn = StorageManager.findSectorToStopOn();
-        menu.onStorageUpdated();
-        console.warn("stopping at: ", sectorToStopOn);
-
-        openCloseButton.onForseClosed();
-        wheel.start();
-        document.removeEventListener("click", clickHandler);
-        wheel.setStoppingAngle(sectorToStopOn);
-        wheel.startStopping().then(function () {
-            wheel.playGiftAnimation(itemsList[sectorToStopOn].name, function () {
-                document.addEventListener("click", clickHandler);
-            });
-        });
-    }
-}
-
-function tapHandler() {
-    console.error("touchstart");
-    var itemsLeft = !StorageManager.isNoMoreItems(),
-        itemsList = JSON.parse(window.localStorage.getItem("itemsList")),
-        sectorToStopOn;
-
-    if(!itemsLeft){
-        console.error("no more items at all");
-    } else {
-        winSound.play();
-        sectorToStopOn = StorageManager.findSectorToStopOn();
-        menu.onStorageUpdated();
-        console.warn("stopping at: ", sectorToStopOn);
-
-        openCloseButton.onForseClosed();
-        wheel.start();
-        document.removeEventListener("touchstart", tapHandler);
-        wheel.setStoppingAngle(sectorToStopOn);
-        wheel.startStopping().then(function () {
-            wheel.playGiftAnimation(itemsList[sectorToStopOn].name, function () {
-                document.addEventListener("touchstart", tapHandler);
-            });
-        });
-    }
-}
-
-document.addEventListener("keypress", spacePressHandler);
-document.addEventListener("touchstart", tapHandler);
-document.addEventListener("click", clickHandler);
