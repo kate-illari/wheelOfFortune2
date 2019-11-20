@@ -100,12 +100,36 @@ export class BonusWheel extends PIXI.Container {
         sprite.interactive = true;
         sprite.anchor.set(0.5, 0.5);
         wheel.addChild(sprite);
+        var actionDown = function () {
+            if(deviceAPI.deviceType === "desktop"){
+                return "mousedown";
+            }
+            return "touchstart"
+        }();
+        var actionUp = function () {
+            if(deviceAPI.deviceType === "desktop"){
+                return "mouseup";
+            }
+            return "touchend"
+        }();
 
-        sprite.on("touchstart", function () {
-            sprite.texture = PIXI.Texture.fromImage("assets/images/stop_click.png");
-            setTimeout(function () {
+        {
+            sprite.on(actionDown, function () {
+                sprite.texture = PIXI.Texture.fromImage("assets/images/stop_click.png");
+            });
+
+            sprite.on("mouseupoutside", function () {
                 sprite.texture = PIXI.Texture.fromImage("assets/images/stop_idle.png");
-            }, 100);
+            });
+
+            sprite.on("touchendoutside", function () {
+                sprite.texture = PIXI.Texture.fromImage("assets/images/stop_idle.png");
+            });
+        }
+
+        sprite.on(actionUp, function () {
+            sprite.texture = PIXI.Texture.fromImage("assets/images/stop_idle.png");
+
             var itemsLeft = !StorageManager.isNoMoreItems(),
                 itemsList = JSON.parse(window.localStorage.getItem("itemsList")),
                 winSound = new Audio("assets/sounds/AUTOMOBILE.mp3"),
@@ -127,9 +151,6 @@ export class BonusWheel extends PIXI.Container {
                     });
                 });
             }
-        });
-        sprite.on("touchend", function () {
-            sprite.texture = PIXI.Texture.fromImage("assets/images/stop_idle.png");
         });
 
         return sprite;
