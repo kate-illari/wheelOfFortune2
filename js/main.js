@@ -25,12 +25,16 @@ const soundButton = new SoundButton({
     }
 });
 
+var docEl = document.documentElement;
+var requestFullScreen = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen ||  docEl.msRequestFullscreen;
+var exitFullscreen = docEl.exitFullscreen || docEl.webkitExitFullscreen || docEl.mozExitFullScreen ||  docEl.msExitFullscreen;
+
 const fullScreenButton = new FullScreenButton({
     enterFullscreenMode: function () {
-        document.documentElement.webkitRequestFullscreen();
+        requestFullScreen();
     },
     exitFullscreenMode: function () {
-        document.webkitExitFullscreen();
+        exitFullscreen();
     }
 });
 
