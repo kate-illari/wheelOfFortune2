@@ -60,7 +60,7 @@ export class BonusWheel extends PIXI.Container {
         me.config = config;
 
         me.pick = me._initPickSprite();
-        me.gift = me._initGiftSprite(me, "SYM0");
+        me.gift = me._initGiftSprite(me, "SYM8");
 
         me.logo = me.initLogo();
 
