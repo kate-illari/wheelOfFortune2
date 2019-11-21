@@ -146,33 +146,39 @@ export class BonusWheel extends PIXI.Container {
     }
 
     onSpinButtonUp(sprite) {
-        sprite.texture = PIXI.Texture.fromImage("assets/images/stop_idle.png");
-
-        var itemsLeft = !StorageManager.isNoMoreItems(),
+        var me = this,
+            itemsLeft = !StorageManager.isNoMoreItems(),
             itemsList = JSON.parse(window.localStorage.getItem("itemsList")),
             sectorToStopOn;
 
+        sprite.texture = PIXI.Texture.fromImage("assets/images/stop_idle.png");
+
         if(!itemsLeft){
             console.error("no more items at all");
-        } else {
-            sprite.interactive = false;
-            this.spinSound.play();
-            sectorToStopOn = StorageManager.findSectorToStopOn();
-            console.warn("stopping at: ", sectorToStopOn);
-
-            wheel.start();
-            wheel.setStoppingAngle(sectorToStopOn);
-            wheel.startStopping().then(function () {
-                if (itemsList[sectorToStopOn].name === "SYM8") {
-                    sprite.interactive = true;
-                } else {
-                    wheel.playGiftAnimation(itemsList[sectorToStopOn].name, function () {
-                        sprite.interactive = true;
-                    });
-                    this.winSound.play();
-                }
-            });
+            return;
         }
+
+        sprite.interactive = false;
+
+        const spinSound = me.spinSound.cloneNode(true);
+        spinSound.play();
+
+        sectorToStopOn = StorageManager.findSectorToStopOn();
+        console.warn("stopping at: ", sectorToStopOn);
+
+        me.start();
+        me.setStoppingAngle(sectorToStopOn);
+        me.startStopping().then(function () {
+            if (itemsList[sectorToStopOn].name === "SYM8") {
+                sprite.interactive = true;
+            } else {
+                me.playGiftAnimation(itemsList[sectorToStopOn].name, () => {
+                    sprite.interactive = true;
+                });
+                const winSound = me.winSound.cloneNode(true);
+                winSound.play();
+            }
+        });
     }
 
     /**
