@@ -1,18 +1,18 @@
 export class StorageManager{
     static initStorage () {
         window.localStorage.setItem("itemsList", JSON.stringify([
-                {name: "SYM0", count: 2},
-                {name: "SYM1", count: 1},
-                {name: "SYM2", count: 4},
-                {name: "SYM3", count: 3},
-                {name: "SYM4", count: 5},
-                {name: "SYM5", count: 1},
-                {name: "SYM6", count: 3},
-                {name: "SYM7", count: 3},
-                {name: "SYM8", count: 2},
-                {name: "SYM9", count: 2},
-                {name: "SYM10", count: 3},
-                {name: "SYM11", count: 1}
+                {name: "SYM8", count: 50},
+                {name: "SYM8", count: 50},
+                {name: "SYM1", count: 40},
+                {name: "SYM8", count: 50},
+                {name: "SYM8", count: 50},
+                {name: "SYM2", count: 40},
+                {name: "SYM8", count: 50},
+                {name: "SYM8", count: 50},
+                {name: "SYM3", count: 40},
+                {name: "SYM8", count: 50},
+                {name: "SYM8", count: 50},
+                {name: "SYM8", count: 50}
             ])
         );
     }
@@ -127,15 +127,19 @@ export class StorageManager{
             probabilityArray = [],
             random;
 
+        console.warn({itemsProbabilities});
         itemsList.forEach(function (item, idx) {
             for (var i = 0; i < itemsProbabilities[idx]; i++) {
                 probabilityArray.push(idx);
             }
         });
 
-        random = this.randomInt(0, 100);
+        console.error({probabilityArray});
 
-        return probabilityArray[random];
+        random = this.randomInt(0, (probabilityArray.length - 1));
+        console.log({random});
+
+        return probabilityArray.sort(() => Math.random() - 0.5)[random];
     }
 
     static isNoMoreItems () {
@@ -147,8 +151,6 @@ export class StorageManager{
             randomIndex = me.getRandomItemAccordingToProbability(),
             itemsList = JSON.parse(window.localStorage.getItem("itemsList")),
             randomItem = itemsList[randomIndex];
-
-        console.error(randomItem);
 
         if (randomItem.count > 0) {
             randomItem.count--;

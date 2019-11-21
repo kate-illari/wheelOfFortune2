@@ -12,10 +12,21 @@ const START_BOUNCE = {
         timeFraction: 1/500
 };
 
-const WHEEL_ITEMS_CENTER_OFFSET = 300;
+const WHEEL_ITEMS_CENTER_OFFSET = 520;
 const WHEEL_ITEM_CONFIG = {
-    width: 100,
-    height: 100
+    width: 220,
+    height: 220
+};
+
+const LOGO_POSITION = {
+    portrait: {
+        x: 0,
+        y: 430
+    },
+    landscape: {
+        x: 380,
+        y: 310
+    }
 };
 
 export class BonusWheel extends PIXI.Container {
@@ -26,7 +37,7 @@ export class BonusWheel extends PIXI.Container {
 
         me.sectorItemsList = config.sectorItemsList;
 
-        me.background = me._initBackground(me, "wheel_bg");
+        me.background = me._initBackground();
 
         me._initBgSpine(me, "glow", app);
 
@@ -36,8 +47,9 @@ export class BonusWheel extends PIXI.Container {
         me.maxSpeed = config.maxSpeed;
         me.minSpeed = config.minSpeed;
 
-        me.sprite = me._initWheelSprite(me, "wheelWin");
-        me.spinButton = me.initSpinButton(me);
+        me.wheelBgDisk = me.initWheelBackground();
+        me.sprite = me._initWheelSprite();
+        me.spinButton = me.initSpinButton();
         me.wheelItems = me._initWheelItems(me.sprite);
 
         //will be added to a separate spine slot:
@@ -47,15 +59,25 @@ export class BonusWheel extends PIXI.Container {
         me.onStartBounceCompleteCallback = onStartBounceCompleteCallback;
         me.config = config;
 
-        me.pick = me._initPickSprite(me);
+        me.pick = me._initPickSprite();
         me.gift = me._initGiftSprite(me, "SYM0");
+
+        me.logo = me.initLogo();
 
         me.reset();
         me.refresh();
     }
 
-    _initBackground (container, imageName) {
-        return container.addChild(new PIXI.Sprite.fromImage("assets/images/"+imageName+".jpg"))
+    _initBackground () {
+        return this.addChild(new PIXI.Sprite.fromImage("assets/images/background.png"))
+    }
+
+    initWheelBackground(){
+        var sprite = new PIXI.Sprite.fromImage("assets/images/disk.png");
+        sprite.anchor.set(0.5, 0.5);
+        sprite.scale.set(0.5);
+
+        return this.addChild(sprite);
     }
 
     _initBgSpine (container, spineName, app) {
@@ -87,19 +109,26 @@ export class BonusWheel extends PIXI.Container {
 
     }
 
-    _initWheelSprite (container, imageName) {
-        var sprite = new PIXI.Sprite.fromImage("assets/images/"+imageName+".png");
+    _initWheelSprite () {
+        var sprite = new PIXI.Sprite.fromImage("assets/images/sectors.png");
         sprite.anchor.set(0.5, 0.5);
-        container.addChild(sprite);
+        sprite.scale.set(0.5);
+
+        return this.addChild(sprite);
+    }
+
+    initSpinButton () {
+        var sprite = new PIXI.Sprite.fromImage("assets/images/stop_idle.png");
+        sprite.interactive = true;
+        sprite.anchor.set(0.5, 0.5);
+        sprite.scale.set(0.5);
+        this.addChild(sprite);
+        this.initSpinButtonActions(sprite);
 
         return sprite;
     }
 
-    initSpinButton (wheel) {
-        var sprite = new PIXI.Sprite.fromImage("assets/images/stop_idle.png");
-        sprite.interactive = true;
-        sprite.anchor.set(0.5, 0.5);
-        wheel.addChild(sprite);
+    initSpinButtonActions(sprite){
         var actionDown = function () {
             if(deviceAPI.deviceType === "desktop"){
                 return "mousedown";
@@ -132,14 +161,14 @@ export class BonusWheel extends PIXI.Container {
 
             var itemsLeft = !StorageManager.isNoMoreItems(),
                 itemsList = JSON.parse(window.localStorage.getItem("itemsList")),
-                winSound = new Audio("assets/sounds/AUTOMOBILE.mp3"),
+                spinSound = new Audio("assets/sounds/ambient.mp3"),
                 sectorToStopOn;
 
             if(!itemsLeft){
                 console.error("no more items at all");
             } else {
                 sprite.interactive = false;
-                winSound.play();
+                spinSound.play();
                 sectorToStopOn = StorageManager.findSectorToStopOn();
                 console.warn("stopping at: ", sectorToStopOn);
 
@@ -152,8 +181,6 @@ export class BonusWheel extends PIXI.Container {
                 });
             }
         });
-
-        return sprite;
     }
 
     /**
@@ -190,11 +217,12 @@ export class BonusWheel extends PIXI.Container {
         return whellItems;
     }
 
-    _initPickSprite (container) {
-        var sprite = new PIXI.Sprite.fromImage("assets/images/pick.png");
+    _initPickSprite () {
+        var sprite = new PIXI.Sprite.fromImage("assets/images/arrow.png");
         sprite.anchor.set(0.5, 0.5);
-        container.addChild(sprite);
-        sprite.position.y = -460;
+        sprite.scale.set(0.5);
+        this.addChild(sprite);
+        sprite.position.y = -350;
 
         return sprite;
     }
@@ -203,9 +231,9 @@ export class BonusWheel extends PIXI.Container {
         var sprite = this._initSprite(imageName, PIXI.BLEND_MODES.NORMAL);
 
         container.addChild(sprite);
-        sprite.width = 100;
-        sprite.height = 100;
-        sprite.position.y = -250;
+        sprite.width = 120;
+        sprite.height = 120;
+        sprite.position.y = -WHEEL_ITEMS_CENTER_OFFSET/2;
         sprite.visible = false;
         sprite.animation = new AnimationHolder({
             addToAnimationLoop: true,
@@ -214,28 +242,28 @@ export class BonusWheel extends PIXI.Container {
                 {
                     prop: "position",
                     animate: {
-                        200: {y: -(WHEEL_ITEMS_CENTER_OFFSET)},
+                        200: {y: -(WHEEL_ITEMS_CENTER_OFFSET/2)},
                         1500: {y: 0},
                         5000: {y: 0},
-                        5500: {y: -(WHEEL_ITEMS_CENTER_OFFSET)},
+                        5500: {y: -(WHEEL_ITEMS_CENTER_OFFSET/2)},
                     }
                 },
                 {
                     prop: "width",
                     animate: {
-                        200: WHEEL_ITEM_CONFIG.width,
+                        200: 120,
                         1500: WHEEL_ITEM_CONFIG.width * 3,
                         5000: WHEEL_ITEM_CONFIG.width * 3,
-                        5500: WHEEL_ITEM_CONFIG.width
+                        5500: 120
                     }
                 },
                 {
                     prop: "height",
                     animate: {
-                        200: WHEEL_ITEM_CONFIG.height,
+                        200: 120,
                         1500: WHEEL_ITEM_CONFIG.height * 3,
                         5000: WHEEL_ITEM_CONFIG.height * 3,
-                        5500: WHEEL_ITEM_CONFIG.height
+                        5500: 120
                     }
                 }
             ]
@@ -554,9 +582,25 @@ export class BonusWheel extends PIXI.Container {
             onEndCallback();
         };
 
-        gift.animation.play();
+        if(name === "SYM8"){
+            me._onWinAnimationComplete(gift);
+            onEndCallback();
+        } else {
+            gift.animation.play();
+        }
+
 
         me.bgAnimation.state.setAnimation(0, 'win', true);
+    }
+
+    initLogo () {
+        var sprite = new PIXI.Sprite.fromImage("assets/images/logo.png");
+        sprite.anchor.set(0.5, 0.5);
+        sprite.scale.set(0.5);
+        this.addChild(sprite);
+        sprite.position.y = -350;
+
+        return sprite;
     }
 
     reset () {
@@ -584,7 +628,19 @@ export class BonusWheel extends PIXI.Container {
     }
 
     refresh () {
-        this.scale.set(window.innerHeight / 1080);
+        this.spinButton.scale.set(0.5);
+        this.background.scale.set(0.5);
+
+        if(window.innerHeight > window.innerWidth){
+            //portrait
+            this.background.rotation = (Math.PI/2);
+            this.logo.position.set(LOGO_POSITION.portrait.x, LOGO_POSITION.portrait.y);
+        } else {
+            //landscape
+            this.background.rotation = (Math.PI*2);
+            this.logo.position.set(LOGO_POSITION.landscape.x, LOGO_POSITION.landscape.y);
+        }
+
     }
 
 }
