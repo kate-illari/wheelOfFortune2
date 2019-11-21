@@ -64,6 +64,9 @@ export class BonusWheel extends PIXI.Container {
 
         me.logo = me.initLogo();
 
+        this.spinSound = new Audio("assets/sounds/spinStart.mp3");
+        this.winSound = new Audio("assets/sounds/win.mp3");
+
         me.reset();
         me.refresh();
     }
@@ -129,64 +132,47 @@ export class BonusWheel extends PIXI.Container {
     }
 
     initSpinButtonActions(sprite){
-        var actionDown = function () {
-            if(deviceAPI.deviceType === "desktop"){
-                return "mousedown";
-            }
-            return "touchstart"
-        }();
-        var actionUp = function () {
-            if(deviceAPI.deviceType === "desktop"){
-                return "mouseup";
-            }
-            return "touchend"
-        }();
+        sprite.on("pointerdown", () => {
+            sprite.texture = PIXI.Texture.fromImage("assets/images/stop_click.png");
+        });
 
-        {
-            sprite.on(actionDown, function () {
-                sprite.texture = PIXI.Texture.fromImage("assets/images/stop_click.png");
-            });
+        sprite.on("pointerup", () => {
+            this.onSpinButtonUp(sprite);
+        });
 
-            sprite.on("mouseupoutside", function () {
-                sprite.texture = PIXI.Texture.fromImage("assets/images/stop_idle.png");
-            });
+        sprite.on("pointerupoutside", () => {
+            sprite.texture = PIXI.Texture.fromImage("assets/images/stop_idle.png");
+        });
+    }
 
-            sprite.on("touchendoutside", function () {
-                sprite.texture = PIXI.Texture.fromImage("assets/images/stop_idle.png");
+    onSpinButtonUp(sprite) {
+        sprite.texture = PIXI.Texture.fromImage("assets/images/stop_idle.png");
+
+        var itemsLeft = !StorageManager.isNoMoreItems(),
+            itemsList = JSON.parse(window.localStorage.getItem("itemsList")),
+            sectorToStopOn;
+
+        if(!itemsLeft){
+            console.error("no more items at all");
+        } else {
+            sprite.interactive = false;
+            this.spinSound.play();
+            sectorToStopOn = StorageManager.findSectorToStopOn();
+            console.warn("stopping at: ", sectorToStopOn);
+
+            wheel.start();
+            wheel.setStoppingAngle(sectorToStopOn);
+            wheel.startStopping().then(function () {
+                if (itemsList[sectorToStopOn].name === "SYM8") {
+                    sprite.interactive = true;
+                } else {
+                    wheel.playGiftAnimation(itemsList[sectorToStopOn].name, function () {
+                        sprite.interactive = true;
+                    });
+                    this.winSound.play();
+                }
             });
         }
-
-        sprite.on(actionUp, function () {
-            sprite.texture = PIXI.Texture.fromImage("assets/images/stop_idle.png");
-
-            var itemsLeft = !StorageManager.isNoMoreItems(),
-                itemsList = JSON.parse(window.localStorage.getItem("itemsList")),
-                spinSound = new Audio("assets/sounds/spinStart.mp3"),
-                winSound = new Audio("assets/sounds/win.mp3"),
-                sectorToStopOn;
-
-            if(!itemsLeft){
-                console.error("no more items at all");
-            } else {
-                sprite.interactive = false;
-                spinSound.play();
-                sectorToStopOn = StorageManager.findSectorToStopOn();
-                console.warn("stopping at: ", sectorToStopOn);
-
-                wheel.start();
-                wheel.setStoppingAngle(sectorToStopOn);
-                wheel.startStopping().then(function () {
-                    if(itemsList[sectorToStopOn].name === "SYM8"){
-                        sprite.interactive = true;
-                    } else {
-                        wheel.playGiftAnimation(itemsList[sectorToStopOn].name, function () {
-                            sprite.interactive = true;
-                        });
-                        winSound.play();
-                    }
-                });
-            }
-        });
     }
 
     /**
