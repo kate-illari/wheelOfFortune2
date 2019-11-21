@@ -11,7 +11,7 @@ export class SoundButton extends PIXI.Sprite {
         this.interactive = true;
         this.buttonMode = true;
         this.on('pointerdown', this.onButtonClick.bind(this));
-        this.ambientSound = new Audio("assets/sounds/ambience.wav");
+        this.ambientSound = new Audio("assets/sounds/ambience.mp3");
         this.ambientSound.loop = true;
         this.currentState = "off";
         this.setOffTexture();
