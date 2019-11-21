@@ -11,19 +11,7 @@ export const animationBuffer = [];
 var app = new PIXI.Application(window.innerWidth, window.innerHeight, {backgroundColor : 0x000000});
 document.body.appendChild(app.view);
 
-var ambientSound = new Audio("assets/sounds/ambient.mp3");
-var winSound = new Audio("assets/sounds/AUTOMOBILE.mp3");
-
-const soundButton = new SoundButton({
-    soundOn: function () {
-        ambientSound.volume = 0.5;
-        winSound.volume = 1;
-    },
-    soundOff: function () {
-        ambientSound.volume = 0;
-        winSound.volume = 0;
-    }
-});
+const soundButton = new SoundButton();
 
 var docEl = document.documentElement;
 var requestFullScreen = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen ||  docEl.msRequestFullscreen;
@@ -61,10 +49,11 @@ var wheel = new BonusWheel({
     accelerationDuration: 1800,
     minimumSpinsBeforeStop: 3,
     sectorItemsList: StorageManager.getSectorItemsList(),
-    image: "SYM0"
+    image: "SYM8"
 }, function () {
     menu.onStorageUpdated();
 }, app);
+window.wheel = wheel;
 
 // move the sprite to the center of the screen
 wheel.position.set(app.screen.width / 2, app.screen.height / 2);
@@ -138,7 +127,9 @@ app.stage.addChild(openCloseButton);
 document.documentElement.webkitRequestFullscreen();
 
 
-window.addEventListener("resize", refreshAll);
-function refreshAll() {
+window.addEventListener("resize", refresh);
+function refresh() {
     wheel.refresh();
 }
+
+window.storageManager = StorageManager;

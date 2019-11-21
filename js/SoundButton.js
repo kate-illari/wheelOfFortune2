@@ -4,18 +4,17 @@ const CONFIG = {
 };
 
 export class SoundButton extends PIXI.Sprite {
-    constructor (config) {
+    constructor () {
         super();
 
         this.position.set(CONFIG.x, CONFIG.y);
         this.interactive = true;
         this.buttonMode = true;
         this.on('pointerdown', this.onButtonClick.bind(this));
-        this.soundOn = config.soundOn;
-        this.soundOff = config.soundOff;
-
-        this.currentState = "on";
-        this.setOnTexture();
+        this.ambientSound = new Audio("assets/sounds/ambience.wav");
+        this.ambientSound.loop = true;
+        this.currentState = "off";
+        this.setOffTexture();
     }
 
     onButtonClick () {
@@ -30,6 +29,14 @@ export class SoundButton extends PIXI.Sprite {
         } else {
             console.error("Check for error, current state is ", this.currentState);
         }
+    }
+
+    soundOn () {
+        this.ambientSound.play();
+    }
+
+    soundOff () {
+        this.ambientSound.pause();
     }
 
     setOffTexture () {

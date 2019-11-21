@@ -161,7 +161,8 @@ export class BonusWheel extends PIXI.Container {
 
             var itemsLeft = !StorageManager.isNoMoreItems(),
                 itemsList = JSON.parse(window.localStorage.getItem("itemsList")),
-                spinSound = new Audio("assets/sounds/ambient.mp3"),
+                spinSound = new Audio("assets/sounds/spinStart.wav"),
+                winSound = new Audio("assets/sounds/win.wav"),
                 sectorToStopOn;
 
             if(!itemsLeft){
@@ -175,9 +176,14 @@ export class BonusWheel extends PIXI.Container {
                 wheel.start();
                 wheel.setStoppingAngle(sectorToStopOn);
                 wheel.startStopping().then(function () {
-                    wheel.playGiftAnimation(itemsList[sectorToStopOn].name, function () {
+                    if(itemsList[sectorToStopOn].name === "SYM8"){
                         sprite.interactive = true;
-                    });
+                    } else {
+                        winSound.play();
+                        wheel.playGiftAnimation(itemsList[sectorToStopOn].name, function () {
+                            sprite.interactive = true;
+                        });
+                    }
                 });
             }
         });
@@ -581,14 +587,6 @@ export class BonusWheel extends PIXI.Container {
             me._onWinAnimationComplete(gift);
             onEndCallback();
         };
-
-        if(name === "SYM8"){
-            me._onWinAnimationComplete(gift);
-            onEndCallback();
-        } else {
-            gift.animation.play();
-        }
-
 
         me.bgAnimation.state.setAnimation(0, 'win', true);
     }
