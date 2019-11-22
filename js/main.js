@@ -1,5 +1,4 @@
 import {SoundButton} from "./SoundButton";
-import {FullScreenButton} from "./FullScreenButton";
 import {ScrollContainer} from "./ScrollContainer";
 import {StorageManager} from "./StorageItemsManager";
 import {BonusWheel} from "./BonusWheel";
@@ -12,19 +11,6 @@ var app = new PIXI.Application(window.innerWidth, window.innerHeight, {backgroun
 document.body.appendChild(app.view);
 
 const soundButton = new SoundButton();
-
-var docEl = document.documentElement;
-var requestFullScreen = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen ||  docEl.msRequestFullscreen;
-var exitFullscreen = docEl.exitFullscreen || docEl.webkitExitFullscreen || docEl.mozExitFullScreen ||  docEl.msExitFullscreen;
-
-const fullScreenButton = new FullScreenButton({
-    enterFullscreenMode: function () {
-        requestFullScreen();
-    },
-    exitFullscreenMode: function () {
-        exitFullscreen();
-    }
-});
 
 var scrollContainer = new ScrollContainer(0, 0, 500, 1000, 1500);
 
@@ -121,7 +107,6 @@ var menu = new Menu({
 scrollContainer.addChild(menu);
 app.stage.addChild(scrollContainer);
 app.stage.addChild(soundButton);
-app.stage.addChild(fullScreenButton);
 app.stage.addChild(openCloseButton);
 
 document.documentElement.webkitRequestFullscreen();
