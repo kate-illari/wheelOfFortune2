@@ -8,14 +8,6 @@ export class Menu extends PIXI.Container{
         this.onItemImgChange = config.onItemImgChange;
         this.onCountChange = config.onCountChange;
 
-        const input = document.createElement('input');
-        input.accept = "image/*";
-        input.id = "inpt";
-        input.type = "file";
-        input.onchange = this.updateImageLocally.bind(this);
-
-        document.body.appendChild(input);
-
         const itemsListContainer = new PIXI.Container();
         itemsListContainer.position.y = TOP_OFFSET;
 
@@ -85,17 +77,12 @@ export class Menu extends PIXI.Container{
         container.addChildAt(graphics, 0);
     }
 
-    addButton (parentContainer, name, itemIndex) {
-        const me = this;
+    addButton (parentContainer, name) {
         const texture = new PIXI.Texture.from("assets/images/prizes/" + name + ".png");
         const itemImage = new PIXI.Sprite(texture);
 
         itemImage.height = 50;
         itemImage.width = 50;
-
-        itemImage.interactive = true;
-        itemImage.buttonMode = true;
-        itemImage.on('pointerdown', me.onItemClick.bind(me, itemImage, itemIndex));
 
         parentContainer.addChild(itemImage);
     }
@@ -185,28 +172,6 @@ export class Menu extends PIXI.Container{
             return;
         }
         this.itemGroups[itemIndex].countText.text = newCount;
-    }
-
-    onItemClick (targetSprite, itemIndex) {
-        document.getElementById("inpt").click();
-        this.targetSprite = targetSprite;
-        this.itemIndex = itemIndex;
-    }
-
-    updateImageLocally () {
-        var me = this,
-            file = document.getElementById("inpt").files[0],
-            reader = new FileReader();
-
-        reader.onload = function () {
-            me.targetSprite.setTexture(new PIXI.Texture.from(reader.result));
-            me.onItemImgChange(me.itemIndex, new PIXI.Texture.from(reader.result));
-        };
-
-        if (file) {
-            reader.readAsDataURL(file);
-        }
-
     }
 
 

@@ -1,5 +1,4 @@
 import {SoundButton} from "./SoundButton";
-import {ScrollContainer} from "./ScrollContainer";
 import {StorageManager} from "./StorageItemsManager";
 import {BonusWheel} from "./BonusWheel";
 import {OpenCloseButton} from "./OpenCloseButton";
@@ -11,8 +10,6 @@ var app = new PIXI.Application(window.innerWidth, window.innerHeight, {backgroun
 document.body.appendChild(app.view);
 
 const soundButton = new SoundButton();
-
-var scrollContainer = new ScrollContainer(0, 0, 500, 1000, 1500);
 
 var prerenderCallbacks = [animate],
     lastTimeStepOccured = 0,
@@ -54,7 +51,6 @@ app.ticker.add(function(delta) {
     prerenderCallbacks.forEach(function(cb) {
         cb();
     });
-    scrollContainer.hideOffscreenElements();
 });
 
 function animate(){
@@ -103,9 +99,7 @@ var menu = new Menu({
     }
 });
 
-//app.stage.addChild(menu);
-scrollContainer.addChild(menu);
-app.stage.addChild(scrollContainer);
+app.stage.addChild(menu);
 app.stage.addChild(soundButton);
 app.stage.addChild(openCloseButton);
 
