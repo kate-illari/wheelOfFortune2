@@ -158,7 +158,7 @@ export class BonusWheel extends PIXI.Container {
         }
 
         sprite.interactive = false;
-        const spinSound = me.spinSound.cloneNode();
+        const spinSound = me.spinSound.cloneNode(true);
         spinSound.play();
 
         sectorToStopOn = StorageManager.findSectorToStopOn();
