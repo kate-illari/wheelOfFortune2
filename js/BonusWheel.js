@@ -64,9 +64,6 @@ export class BonusWheel extends PIXI.Container {
 
         me.logo = me.initLogo();
 
-        this.spinSound = document.getElementById("spinSound");
-        this.winSound = document.getElementById("winSound");
-
         me.reset();
         me.refresh();
     }
@@ -160,8 +157,6 @@ export class BonusWheel extends PIXI.Container {
 
         sprite.interactive = false;
 
-        me.spinSound.play();
-
         sectorToStopOn = StorageManager.findSectorToStopOn();
         console.warn("stopping at: ", sectorToStopOn);
 
@@ -174,7 +169,6 @@ export class BonusWheel extends PIXI.Container {
                 me.playGiftAnimation(itemsList[sectorToStopOn].name, () => {
                     sprite.interactive = true;
                 });
-                me.winSound.play();
             }
         });
     }
