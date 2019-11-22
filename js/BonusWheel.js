@@ -174,8 +174,7 @@ export class BonusWheel extends PIXI.Container {
                 me.playGiftAnimation(itemsList[sectorToStopOn].name, () => {
                     sprite.interactive = true;
                 });
-                const winSound = me.winSound.cloneNode();
-                winSound.play();
+                me.winSound.play();
             }
         });
     }
