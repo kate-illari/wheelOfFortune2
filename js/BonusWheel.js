@@ -64,8 +64,8 @@ export class BonusWheel extends PIXI.Container {
         this.spinSound = document.getElementById("spinSound");
         this.winSound = document.getElementById("winSound");
 
-        me._initBgSpine(me, "glow", app);
         me.pick = me._initPickSprite();
+        me._initBgSpine(me, "glow", app);
 
 
         me.reset();
@@ -99,6 +99,7 @@ export class BonusWheel extends PIXI.Container {
             glow.autoUpdate = false;
             glow.scale.set(0.75);
             me.addChild(glow);
+            me.addChild(me.pick); // adding it here to make sure it's on top!!!
 
             // once position and scaled, set the animation to play
             glow.state.setAnimation(0, 'spin', true);
@@ -157,7 +158,8 @@ export class BonusWheel extends PIXI.Container {
         }
 
         sprite.interactive = false;
-        me.spinSound.play();
+        const spinSound = me.spinSound.cloneNode();
+        spinSound.play();
 
         sectorToStopOn = StorageManager.findSectorToStopOn();
         console.warn("stopping at: ", sectorToStopOn);
@@ -167,12 +169,13 @@ export class BonusWheel extends PIXI.Container {
         me.startStopping().then(function () {
             if (itemsList[sectorToStopOn].name === "SYM8") {
                 sprite.interactive = true;
-                this.bgAnimation.visible = false;
+                me.bgAnimation.visible = false;
             } else {
                 me.playGiftAnimation(itemsList[sectorToStopOn].name, () => {
                     sprite.interactive = true;
                 });
-                me.winSound.play();
+                const winSound = me.winSound.cloneNode();
+                winSound.play();
             }
         });
     }
@@ -214,7 +217,6 @@ export class BonusWheel extends PIXI.Container {
     _initPickSprite () {
         var sprite = new PIXI.Sprite.fromImage("assets/images/arrow.png");
         sprite.anchor.set(0.5, 0.5);
-        this.addChild(sprite);
         sprite.position.y = -350;
 
         return sprite;
