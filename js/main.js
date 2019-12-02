@@ -111,4 +111,17 @@ function refresh() {
     wheel.refresh();
 }
 
+function keyDownHandler(event) {
+    if(event.keyCode === 32){
+        document.removeEventListener("keydown", keyDownHandler);
+        wheel.onSpinButtonDown();
+
+        setTimeout(() => {
+            wheel.releaseHardButton(() => {document.addEventListener("keydown", keyDownHandler)});
+        }, 300);
+    }
+}
+
+document.addEventListener("keydown", keyDownHandler);
+
 window.storageManager = StorageManager;

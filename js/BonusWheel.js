@@ -48,6 +48,8 @@ export class BonusWheel extends PIXI.Container {
 
         me.sprite = me._initWheelSprite();
         me.spinButton = me.initSpinButton();
+        me.initSpinButtonActions();
+
         me.wheelItems = me._initWheelItems(me.sprite);
         //will be added to a separate spine slot:
         me.highlightSprite = typeof config.image !== "undefined" ? me._initSprite(config.image, PIXI.BLEND_MODES.ADD) : me._initEmptySprite();
@@ -124,39 +126,49 @@ export class BonusWheel extends PIXI.Container {
         sprite.interactive = true;
         sprite.anchor.set(0.5, 0.5);
         this.addChild(sprite);
-        this.initSpinButtonActions(sprite);
 
         return sprite;
     }
 
-    initSpinButtonActions(sprite){
-        sprite.on("pointerdown", () => {
-            sprite.texture = PIXI.Texture.fromImage("assets/images/stop_click.png");
+    initSpinButtonActions(){
+        var me = this,
+            button = me.spinButton;
+
+        button.on("pointerdown", () => {
+            button.texture = PIXI.Texture.fromImage("assets/images/stop_click.png");
         });
 
-        sprite.on("pointerup", () => {
-            this.onSpinButtonUp(sprite);
+        button.on("pointerup", () => {
+            this.onSpinButtonUp();
         });
 
-        sprite.on("pointerupoutside", () => {
-            sprite.texture = PIXI.Texture.fromImage("assets/images/stop_idle.png");
+        button.on("pointerupoutside", () => {
+            button.texture = PIXI.Texture.fromImage("assets/images/stop_idle.png");
         });
     }
 
-    onSpinButtonUp(sprite) {
+    onSpinButtonDown() {
         var me = this,
+            button = me.spinButton;
+
+        button.texture = PIXI.Texture.fromImage("assets/images/stop_click.png");
+    }
+
+    onSpinButtonUp() {
+        var me = this,
+            button = me.spinButton,
             itemsLeft = !StorageManager.isNoMoreItems(),
             itemsList = JSON.parse(window.localStorage.getItem("itemsList")),
             sectorToStopOn;
 
-        sprite.texture = PIXI.Texture.fromImage("assets/images/stop_idle.png");
+        button.texture = PIXI.Texture.fromImage("assets/images/stop_idle.png");
 
         if(!itemsLeft){
             console.error("no more items at all");
             return;
         }
 
-        sprite.interactive = false;
+        button.interactive = false;
 
         sectorToStopOn = StorageManager.findSectorToStopOn();
         console.warn("stopping at: ", sectorToStopOn);
@@ -165,11 +177,46 @@ export class BonusWheel extends PIXI.Container {
         me.setStoppingAngle(sectorToStopOn);
         me.startStopping().then(function () {
             if (itemsList[sectorToStopOn].name === "SYM8") {
-                sprite.interactive = true;
+                button.interactive = true;
                 me.bgAnimation.visible = false;
             } else {
                 me.playGiftAnimation(itemsList[sectorToStopOn].name, () => {
-                    sprite.interactive = true;
+                    button.interactive = true;
+                });
+            }
+        });
+    }
+
+    releaseHardButton(callback) {
+        var me = this,
+            button = me.spinButton,
+            itemsLeft = !StorageManager.isNoMoreItems(),
+            itemsList = JSON.parse(window.localStorage.getItem("itemsList")),
+            sectorToStopOn;
+
+        button.texture = PIXI.Texture.fromImage("assets/images/stop_idle.png");
+
+        if(!itemsLeft){
+            console.error("no more items at all");
+            return;
+        }
+
+        button.interactive = false;
+
+        sectorToStopOn = StorageManager.findSectorToStopOn();
+        console.warn("stopping at: ", sectorToStopOn);
+
+        me.start();
+        me.setStoppingAngle(sectorToStopOn);
+        me.startStopping().then(function () {
+            if (itemsList[sectorToStopOn].name === "SYM8") {
+                button.interactive = true;
+                me.bgAnimation.visible = false;
+                callback();
+            } else {
+                me.playGiftAnimation(itemsList[sectorToStopOn].name, () => {
+                    button.interactive = true;
+                    callback();
                 });
             }
         });
