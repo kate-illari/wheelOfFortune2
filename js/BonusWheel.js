@@ -60,7 +60,7 @@ export class BonusWheel extends PIXI.Container {
         me.config = config;
         me.pick = me._initPickSprite();
 
-        me.gift = me._initGiftSprite(me, "SYM8");
+        me.gift = me._initGiftSprite(me, "EMPTY");
         me.logo = me.initLogo();
 
         this.winSound = document.getElementById("winSound");
@@ -176,7 +176,7 @@ export class BonusWheel extends PIXI.Container {
         me.start();
         me.setStoppingAngle(sectorToStopOn);
         me.startStopping().then(function () {
-            if (itemsList[sectorToStopOn].name === "SYM8") {
+            if (itemsList[sectorToStopOn].name === "EMPTY") {
                 button.interactive = true;
                 me.bgAnimation.visible = false;
             } else {
@@ -209,7 +209,7 @@ export class BonusWheel extends PIXI.Container {
         me.start();
         me.setStoppingAngle(sectorToStopOn);
         me.startStopping().then(function () {
-            if (itemsList[sectorToStopOn].name === "SYM8") {
+            if (itemsList[sectorToStopOn].name === "EMPTY") {
                 button.interactive = true;
                 me.bgAnimation.visible = false;
                 callback();

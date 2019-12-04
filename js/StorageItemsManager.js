@@ -1,18 +1,18 @@
 export class StorageManager{
     static initStorage () {
         window.localStorage.setItem("itemsList", JSON.stringify([
-                {name: "SYM8", count: 50},
-                {name: "SYM8", count: 50},
-                {name: "SYM1", count: 40},
-                {name: "SYM8", count: 50},
-                {name: "SYM8", count: 50},
-                {name: "SYM2", count: 40},
-                {name: "SYM8", count: 50},
-                {name: "SYM8", count: 50},
-                {name: "SYM3", count: 40},
-                {name: "SYM8", count: 50},
-                {name: "SYM8", count: 50},
-                {name: "SYM8", count: 50}
+                {name: "SYM1", count: 1},
+                {name: "SYM2", count: 93},
+                {name: "SYM3", count: 16},
+                {name: "SYM4", count: 60},
+                {name: "SYM5", count: 94},
+                {name: "SYM6", count: 80},
+                {name: "SYM7", count: 10},
+                {name: "SYM8", count: 2},
+                {name: "SYM9", count: 11},
+                {name: "SYM10", count: 5},
+                {name: "SYM11", count: 7},
+                {name: "SYM12", count: 35}
             ])
         );
     }
