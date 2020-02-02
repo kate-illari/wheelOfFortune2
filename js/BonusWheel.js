@@ -209,16 +209,10 @@ export class BonusWheel extends PIXI.Container {
         me.start();
         me.setStoppingAngle(sectorToStopOn);
         me.startStopping().then(function () {
-            if (itemsList[sectorToStopOn].name === "EMPTY") {
+            me.playGiftAnimation("SYM" + sectorToStopOn, () => {
                 button.interactive = true;
-                me.bgAnimation.visible = false;
                 callback();
-            } else {
-                me.playGiftAnimation(itemsList[sectorToStopOn].name, () => {
-                    button.interactive = true;
-                    callback();
-                });
-            }
+            });
         });
     }
 
