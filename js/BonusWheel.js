@@ -50,7 +50,7 @@ export class BonusWheel extends PIXI.Container {
         me.spinButton = me.initSpinButton();
         me.initSpinButtonActions();
 
-        me.wheelItems = me._initWheelItems(me.sprite);
+        BonusWheel.wheelItems = me._initWheelItems(me.sprite);
         //will be added to a separate spine slot:
         me.highlightSprite = typeof config.image !== "undefined" ? me._initSprite(config.image, PIXI.BLEND_MODES.ADD) : me._initEmptySprite();
 
@@ -158,13 +158,13 @@ export class BonusWheel extends PIXI.Container {
         var me = this,
             button = me.spinButton,
             itemsLeft = !StorageManager.isNoMoreItems(),
-            itemsList = JSON.parse(window.localStorage.getItem("itemsList")),
+            itemsList = StorageManager.getLocalStorageItem("itemsList"),
             sectorToStopOn;
 
         button.texture = PIXI.Texture.fromImage("assets/images/stop_idle.png");
 
         if(!itemsLeft){
-            console.error("no more items at all");
+            alert("No more items, please go to menu");
             return;
         }
 
@@ -176,11 +176,11 @@ export class BonusWheel extends PIXI.Container {
         me.start();
         me.setStoppingAngle(sectorToStopOn);
         me.startStopping().then(function () {
-            if (itemsList[sectorToStopOn].name === "EMPTY") {
+            if (Object.values(itemsList)[sectorToStopOn].name === "EMPTY") {
                 button.interactive = true;
                 me.bgAnimation.visible = false;
             } else {
-                me.playGiftAnimation(itemsList[sectorToStopOn].name, () => {
+                me.playGiftAnimation(Object.keys(itemsList)[sectorToStopOn], () => {
                     button.interactive = true;
                 });
             }
@@ -191,7 +191,7 @@ export class BonusWheel extends PIXI.Container {
         var me = this,
             button = me.spinButton,
             itemsLeft = !StorageManager.isNoMoreItems(),
-            itemsList = JSON.parse(window.localStorage.getItem("itemsList")),
+            itemsList = StorageManager.getLocalStorageItem("itemsList"),
             sectorToStopOn;
 
         button.texture = PIXI.Texture.fromImage("assets/images/stop_idle.png");
@@ -233,14 +233,14 @@ export class BonusWheel extends PIXI.Container {
         var me = this,
             sizedContainer,
             bonusWheelItem,
-            whellItems = [];
+            whellItems = {};
 
         me.sectorItemsList.forEach(function (item, index) {
             sizedContainer = new PIXI.Container();
 
             bonusWheelItem = new BonusWheelItem({
                 parent: sizedContainer,
-                texture: new PIXI.Texture.fromImage("assets/images/prizes/" + item + ".png"),
+                texture: new PIXI.Texture.fromImage(StorageManager.getImgPath(item)),
                 sectorIndex: index,
                 centerOffset: WHEEL_ITEMS_CENTER_OFFSET,
                 totalSectorsNum: me.sectorItemsList.length
@@ -250,7 +250,7 @@ export class BonusWheel extends PIXI.Container {
             bonusWheelItem.height = WHEEL_ITEM_CONFIG.height;
 
             parent.addChild(sizedContainer);
-            whellItems.push(bonusWheelItem);
+            whellItems[item] = bonusWheelItem;
         });
 
         return whellItems;
@@ -316,14 +316,14 @@ export class BonusWheel extends PIXI.Container {
      */
     _onWinAnimationComplete(animSprite){
         animSprite.visible = false;
-        this.wheelItems.forEach(function(wheelItem){
+        Object.values(BonusWheel.wheelItems).forEach(function(wheelItem){
             wheelItem.show();
         });
         this.bgAnimation.visible = false;
     }
 
     _initSprite (imageName, blendMode) {
-        var sprite = new PIXI.Sprite.fromImage("assets/images/prizes/"+imageName+".png");
+        var sprite = new PIXI.Sprite.fromImage(StorageManager.getImgPath(imageName));
 
         sprite.anchor.set(0.5, 0.5);
         sprite.blendMode = blendMode;
@@ -603,11 +603,12 @@ export class BonusWheel extends PIXI.Container {
     }
 
     playGiftAnimation (name, onEndCallback) {
+        console.warn(name);
         var me = this,
             gift = me.gift,
             totalSectorsNum = me.sectorItemsList.length,
             currentItemIndex = Math.round( totalSectorsNum / CIRCLE_DEG * me.stopAngle),
-            currentWheelItem = me.wheelItems[currentItemIndex];
+            currentWheelItem = BonusWheel.wheelItems[name];
 
         currentWheelItem.hide();
 
@@ -655,8 +656,8 @@ export class BonusWheel extends PIXI.Container {
         })
     }
 
-    changeTexture (itemIndex, texture) {
-        this.wheelItems[itemIndex].texture = texture;
+    static changeTexture(name, texture){
+        BonusWheel.wheelItems[name].texture = texture;
     }
 
     refresh () {

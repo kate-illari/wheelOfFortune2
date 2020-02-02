@@ -1,28 +1,33 @@
+import {StorageManager} from "./StorageItemsManager";
+import {imagesConfig} from "./imagesConfig";
+
 const OFFSET = 10;
 const TOP_OFFSET = 80;
 
 export class Menu extends PIXI.Container{
-    constructor (config) {
+    constructor () {
         super();
 
-        this.onItemImgChange = config.onItemImgChange;
-        this.onCountChange = config.onCountChange;
-
         const itemsListContainer = new PIXI.Container();
+        const imageSelectorContainer = this.createImageSelectorInterface();
         itemsListContainer.position.y = TOP_OFFSET;
 
-        const itemsList = JSON.parse(window.localStorage.getItem("itemsList"));
+        const itemsList = StorageManager.getLocalStorageItem("itemsList");
         this.itemGroups = this.createItemsListInterface(itemsList, itemsListContainer);
+
         this.addChild(itemsListContainer);
+        this.addChild(imageSelectorContainer);
 
         this.hideMenu();
+        imageSelectorContainer.visible = false;
+        this.imageSelectorContainer = imageSelectorContainer;
     }
 
     onStorageUpdated () {
         console.log("updating the storage");
-        const itemsList = JSON.parse(window.localStorage.getItem("itemsList"));
+        const itemsList = StorageManager.getLocalStorageItem("itemsList");
         this.itemGroups.forEach(function (item, index) {
-            item.countText.text = itemsList[index].count;
+            item.countText.text = itemsList["SYM" + index].count;
         });
 
     }
@@ -41,13 +46,45 @@ export class Menu extends PIXI.Container{
 
         PIXI.loader
             .load(
-                itemsList.forEach(function (item, itemIndex) {
+                Object.values(itemsList).forEach(function (item, itemIndex) {
+                    item.name = Object.keys(itemsList)[itemIndex];
                     itemGroup = me.createItemContainer(parentContainer, item, itemIndex);
                     itemGroups[itemIndex] = itemGroup;
                 })
             );
 
         return itemGroups;
+    }
+
+    createImageSelectorInterface () {
+        const container = new PIXI.Container();
+        const me = this;
+        container.position.set(200, TOP_OFFSET);
+
+        PIXI.loader
+            .load(
+                Object.values(imagesConfig).forEach(function (imagePath, imageIndex) {
+                    const texture = new PIXI.Texture.from(imagePath);
+                    const itemImage = new PIXI.Sprite(texture);
+
+                    itemImage.height = 28;
+                    itemImage.width = 28;
+                    itemImage.position.set(0, 28 * imageIndex);
+                    itemImage.interactive = true;
+                    itemImage.buttonMode = true;
+                    itemImage.on('pointerdown', me.onNewImgSelected.bind(me, imagePath));
+
+                    container.addChild(itemImage);
+                })
+            );
+
+        this.addItemsListBg(container);
+        return container;
+    }
+
+    onNewImgSelected(imagePath){
+        this.targetSprite.setTexture(new PIXI.Texture.from(imagePath));
+        StorageManager.setNewImgPath(this.targetName, imagePath);
     }
 
     createItemContainer (parentContainer, item, itemIndex) {
@@ -78,11 +115,15 @@ export class Menu extends PIXI.Container{
     }
 
     addButton (parentContainer, name) {
-        const texture = new PIXI.Texture.from("assets/images/prizes/" + name + ".png");
+        const texture = new PIXI.Texture.from(StorageManager.getImgPath(name));
         const itemImage = new PIXI.Sprite(texture);
+        const me = this;
 
         itemImage.height = 50;
         itemImage.width = 50;
+        itemImage.interactive = true;
+        itemImage.buttonMode = true;
+        itemImage.on('pointerdown', me.onItemClick.bind(me, itemImage, name));
 
         parentContainer.addChild(itemImage);
     }
@@ -146,33 +187,22 @@ export class Menu extends PIXI.Container{
     }
 
     onPlusButtonClick (itemIndex) {
-        let newCount = JSON.parse(window.localStorage.getItem("itemsList"))[itemIndex].count + 1;
-
-        this.onCountChange(itemIndex, newCount);
-        this.updateCountText(itemIndex, newCount);
+        StorageManager.addItem(itemIndex, 1);
+        this.updateCountText(itemIndex);
     }
 
     onMinusButtonClick (itemIndex) {
-        const currentCount = JSON.parse(window.localStorage.getItem("itemsList"))[itemIndex].count;
-        let newCount;
-
-        if((currentCount - 1) <= 0){
-            newCount = 0;
-        } else {
-            newCount = currentCount - 1 ;
-        }
-
-        this.onCountChange(itemIndex, newCount);
-        this.updateCountText(itemIndex, newCount);
+        StorageManager.removeItem(itemIndex, 1);
+        this.updateCountText(itemIndex);
     }
 
-    updateCountText (itemIndex, newCount) {
-        if(!newCount){
-            this.itemGroups[itemIndex].countText.text = JSON.parse(window.localStorage.getItem("itemsList"))[itemIndex].count;
-            return;
-        }
-        this.itemGroups[itemIndex].countText.text = newCount;
+    updateCountText (itemIndex) {
+            this.itemGroups[itemIndex].countText.text = StorageManager.getLocalStorageItem("itemsList")["SYM" + itemIndex].count;
     }
 
-
+    onItemClick (targetSprite, targetName) {
+        this.targetSprite = targetSprite;
+        this.targetName = targetName;
+        this.imageSelectorContainer.visible = !this.imageSelectorContainer.visible;
+    }
 }

@@ -1,4 +1,5 @@
 import {SoundButton} from "./SoundButton";
+import {FullScreenButton} from "./FullScreenButton";
 import {StorageManager} from "./StorageItemsManager";
 import {BonusWheel} from "./BonusWheel";
 import {OpenCloseButton} from "./OpenCloseButton";
@@ -10,6 +11,7 @@ var app = new PIXI.Application(window.innerWidth, window.innerHeight, {backgroun
 document.body.appendChild(app.view);
 
 const soundButton = new SoundButton();
+const fullScreenButton = new FullScreenButton();
 
 var prerenderCallbacks = [animate],
     lastTimeStepOccured = 0,
@@ -90,18 +92,12 @@ var openCloseButton = new OpenCloseButton({
     }
 });
 
-var menu = new Menu({
-    onItemImgChange: function (index, texture) {
-        wheel.changeTexture(index, texture);
-    },
-    onCountChange: function (index, count) {
-        StorageManager.setItemCount(index, count);
-    }
-});
+var menu = new Menu();
 
 app.stage.addChild(menu);
 app.stage.addChild(soundButton);
 app.stage.addChild(openCloseButton);
+app.stage.addChild(fullScreenButton);
 
 document.documentElement.webkitRequestFullscreen();
 
