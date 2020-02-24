@@ -13,7 +13,7 @@ export class Menu extends PIXI.Container{
         itemsListContainer.position.y = TOP_OFFSET;
 
         const itemsList = StorageManager.getLocalStorageItem("itemsList");
-        this.itemGroups = this.createItemsListInterface(itemsList, itemsListContainer);
+        Menu.itemGroups = this.createItemsListInterface(itemsList, itemsListContainer);
 
         this.addChild(itemsListContainer);
         this.addChild(imageSelectorContainer);
@@ -26,7 +26,7 @@ export class Menu extends PIXI.Container{
     onStorageUpdated () {
         console.log("updating the storage");
         const itemsList = StorageManager.getLocalStorageItem("itemsList");
-        this.itemGroups.forEach(function (item, index) {
+        Menu.itemGroups.forEach(function (item, index) {
             item.countText.text = itemsList["SYM" + index].count;
         });
 
@@ -116,6 +116,7 @@ export class Menu extends PIXI.Container{
 
     addButton (parentContainer, name) {
         const texture = new PIXI.Texture.from(StorageManager.getImgPath(name));
+        console.warn(texture);
         const itemImage = new PIXI.Sprite(texture);
         const me = this;
 
@@ -197,7 +198,7 @@ export class Menu extends PIXI.Container{
     }
 
     updateCountText (itemIndex) {
-            this.itemGroups[itemIndex].countText.text = StorageManager.getLocalStorageItem("itemsList")["SYM" + itemIndex].count;
+        Menu.itemGroups[itemIndex].countText.text = StorageManager.getLocalStorageItem("itemsList")["SYM" + itemIndex].count;
     }
 
     onItemClick (targetSprite, targetName) {

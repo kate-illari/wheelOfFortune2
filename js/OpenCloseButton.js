@@ -5,15 +5,15 @@ const CONFIG = {
 
 export class OpenCloseButton extends PIXI.Sprite{
 
-    constructor (config) {
+    constructor (menu) {
         super();
 
         this.position.set(CONFIG.x, CONFIG.y);
         this.interactive = true;
         this.buttonMode = true;
         this.on('pointerdown', this.onButtonClick.bind(this));
-        this.openCallback = config.openCallback;
-        this.closeCallback = config.closeCallback;
+        this.openCallback = menu.showMenu.bind(menu);
+        this.closeCallback = menu.hideMenu.bind(menu);
 
         this.currentState = "closed";
         this.setClosedTexture();

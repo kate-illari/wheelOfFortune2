@@ -907,21 +907,33 @@ const LOGO_POSITION = {
     }
 };
 
+const WHEEL_CONFIG = {
+    name: "freespins",
+    spineSlot: "1st_back",
+    highlightSlot: "1st_back2",
+    sectors: [0,1,2,3,4,5,6,7,8,9,10,11],
+    maxSpeed: 16,
+    minSpeed: 0.15,
+    accelerationDuration: 1800,
+    minimumSpinsBeforeStop: 3,
+    image: "SYM8"
+};
+
 class BonusWheel extends PIXI.Container {
     
-    constructor (config, onStartBounceCompleteCallback, app) {
+    constructor (onStartBounceCompleteCallback, app) {
         super();
         var me = this;
 
-        me.sectorItemsList = config.sectorItemsList;
+        me.sectorItemsList = _StorageItemsManager__WEBPACK_IMPORTED_MODULE_2__["StorageManager"].getSectorItemsList();
 
         me.background = me._initBackground();
         me.background.anchor.set(0.5,0.5);
 
         //degrees per frame
-        me.maxSpeed = config.maxSpeed;
+        me.maxSpeed = WHEEL_CONFIG.maxSpeed;
 
-        me.minSpeed = config.minSpeed;
+        me.minSpeed = WHEEL_CONFIG.minSpeed;
         me.wheelBgDisk = me.initWheelBackground();
 
         me.sprite = me._initWheelSprite();
@@ -930,12 +942,12 @@ class BonusWheel extends PIXI.Container {
 
         BonusWheel.wheelItems = me._initWheelItems(me.sprite);
         //will be added to a separate spine slot:
-        me.highlightSprite = typeof config.image !== "undefined" ? me._initSprite(config.image, PIXI.BLEND_MODES.ADD) : me._initEmptySprite();
+        me.highlightSprite = typeof WHEEL_CONFIG.image !== "undefined" ? me._initSprite(WHEEL_CONFIG.image, PIXI.BLEND_MODES.ADD) : me._initEmptySprite();
 
-        me.sectorsAngles = me._mapSectorsAgles(config.sectors);
-        me.animations = me._initAnimations(config);
+        me.sectorsAngles = me._mapSectorsAgles(WHEEL_CONFIG.sectors);
+        me.animations = me._initAnimations(WHEEL_CONFIG);
         me.onStartBounceCompleteCallback = onStartBounceCompleteCallback;
-        me.config = config;
+        me.config = WHEEL_CONFIG;
         me.pick = me._initPickSprite();
 
         me.gift = me._initGiftSprite(me, "EMPTY");
@@ -1069,7 +1081,6 @@ class BonusWheel extends PIXI.Container {
         var me = this,
             button = me.spinButton,
             itemsLeft = !_StorageItemsManager__WEBPACK_IMPORTED_MODULE_2__["StorageManager"].isNoMoreItems(),
-            itemsList = _StorageItemsManager__WEBPACK_IMPORTED_MODULE_2__["StorageManager"].getLocalStorageItem("itemsList"),
             sectorToStopOn;
 
         button.texture = PIXI.Texture.fromImage("assets/images/stop_idle.png");
@@ -1389,7 +1400,8 @@ class BonusWheel extends PIXI.Container {
         this.onWheelStartCallback = callback;
         this.animations.accelerationTicker.play();
 
-
+        const winSound = this.winSound.cloneNode();
+        winSound.play();
     }
 
     startDeceleration (prevWheelStoppingDistance, onWheelStopped) {
@@ -1478,8 +1490,6 @@ class BonusWheel extends PIXI.Container {
         console.warn(name);
         var me = this,
             gift = me.gift,
-            totalSectorsNum = me.sectorItemsList.length,
-            currentItemIndex = Math.round( totalSectorsNum / CIRCLE_DEG * me.stopAngle),
             currentWheelItem = BonusWheel.wheelItems[name];
 
         currentWheelItem.hide();
@@ -1491,8 +1501,6 @@ class BonusWheel extends PIXI.Container {
             me._onWinAnimationComplete(gift);
             onEndCallback();
         };
-        const winSound = me.winSound.cloneNode();
-        winSound.play();
 
         gift.animation.play();
 
@@ -1677,7 +1685,7 @@ class Menu extends PIXI.Container{
         itemsListContainer.position.y = TOP_OFFSET;
 
         const itemsList = _StorageItemsManager__WEBPACK_IMPORTED_MODULE_0__["StorageManager"].getLocalStorageItem("itemsList");
-        this.itemGroups = this.createItemsListInterface(itemsList, itemsListContainer);
+        Menu.itemGroups = this.createItemsListInterface(itemsList, itemsListContainer);
 
         this.addChild(itemsListContainer);
         this.addChild(imageSelectorContainer);
@@ -1690,7 +1698,7 @@ class Menu extends PIXI.Container{
     onStorageUpdated () {
         console.log("updating the storage");
         const itemsList = _StorageItemsManager__WEBPACK_IMPORTED_MODULE_0__["StorageManager"].getLocalStorageItem("itemsList");
-        this.itemGroups.forEach(function (item, index) {
+        Menu.itemGroups.forEach(function (item, index) {
             item.countText.text = itemsList["SYM" + index].count;
         });
 
@@ -1780,6 +1788,7 @@ class Menu extends PIXI.Container{
 
     addButton (parentContainer, name) {
         const texture = new PIXI.Texture.from(_StorageItemsManager__WEBPACK_IMPORTED_MODULE_0__["StorageManager"].getImgPath(name));
+        console.warn(texture);
         const itemImage = new PIXI.Sprite(texture);
         const me = this;
 
@@ -1861,7 +1870,7 @@ class Menu extends PIXI.Container{
     }
 
     updateCountText (itemIndex) {
-            this.itemGroups[itemIndex].countText.text = _StorageItemsManager__WEBPACK_IMPORTED_MODULE_0__["StorageManager"].getLocalStorageItem("itemsList")["SYM" + itemIndex].count;
+        Menu.itemGroups[itemIndex].countText.text = _StorageItemsManager__WEBPACK_IMPORTED_MODULE_0__["StorageManager"].getLocalStorageItem("itemsList")["SYM" + itemIndex].count;
     }
 
     onItemClick (targetSprite, targetName) {
@@ -1890,15 +1899,15 @@ const CONFIG = {
 
 class OpenCloseButton extends PIXI.Sprite{
 
-    constructor (config) {
+    constructor (menu) {
         super();
 
         this.position.set(CONFIG.x, CONFIG.y);
         this.interactive = true;
         this.buttonMode = true;
         this.on('pointerdown', this.onButtonClick.bind(this));
-        this.openCallback = config.openCallback;
-        this.closeCallback = config.closeCallback;
+        this.openCallback = menu.showMenu.bind(menu);
+        this.closeCallback = menu.hideMenu.bind(menu);
 
         this.currentState = "closed";
         this.setClosedTexture();
@@ -1930,6 +1939,48 @@ class OpenCloseButton extends PIXI.Sprite{
         this.currentState = "closed";
         this.setClosedTexture();
         this.closeCallback();
+    }
+}
+
+/***/ }),
+
+/***/ "./js/ResetButton.js":
+/*!***************************!*\
+  !*** ./js/ResetButton.js ***!
+  \***************************/
+/*! exports provided: ResetButton */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ResetButton", function() { return ResetButton; });
+const CONFIG = {
+    x: 20,
+    y: 100,
+    width: 15,
+    height: 15,
+};
+
+class ResetButton extends PIXI.Sprite {
+    constructor () {
+        super();
+
+        this.texture = new PIXI.Texture.from("assets/images/buttons/reset.png");
+        this.position.set(CONFIG.x, window.innerHeight - 50);
+        this.width = CONFIG.width;
+        this.height = CONFIG.height;
+        this.interactive = true;
+        this.buttonMode = true;
+        this.on('pointerdown', this.onButtonClick.bind(this));
+    }
+
+    onButtonClick () {
+        const confirmed = confirm("Are you sure to reset all values and images to default? You may lose your progress.");
+
+        if(confirmed){
+            window.localStorage.clear();
+            location.reload();
+        }
     }
 }
 
@@ -2218,6 +2269,7 @@ const imagesConfig = {
     SYM10_old: "assets/images/prizes/SYM10_old.png",
     SYM11_old: "assets/images/prizes/SYM11_old.png",
     SYM12_old: "assets/images/prizes/SYM12_old.png",
+    run: "assets/images/prizes/run.png",
 };
 
 /***/ }),
@@ -2233,11 +2285,13 @@ const imagesConfig = {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "animationBuffer", function() { return animationBuffer; });
 /* harmony import */ var _SoundButton__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./SoundButton */ "./js/SoundButton.js");
-/* harmony import */ var _FullScreenButton__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./FullScreenButton */ "./js/FullScreenButton.js");
-/* harmony import */ var _StorageItemsManager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./StorageItemsManager */ "./js/StorageItemsManager.js");
-/* harmony import */ var _BonusWheel__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./BonusWheel */ "./js/BonusWheel.js");
-/* harmony import */ var _OpenCloseButton__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./OpenCloseButton */ "./js/OpenCloseButton.js");
-/* harmony import */ var _Menu__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Menu */ "./js/Menu.js");
+/* harmony import */ var _ResetButton__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ResetButton */ "./js/ResetButton.js");
+/* harmony import */ var _FullScreenButton__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./FullScreenButton */ "./js/FullScreenButton.js");
+/* harmony import */ var _StorageItemsManager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./StorageItemsManager */ "./js/StorageItemsManager.js");
+/* harmony import */ var _BonusWheel__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./BonusWheel */ "./js/BonusWheel.js");
+/* harmony import */ var _OpenCloseButton__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./OpenCloseButton */ "./js/OpenCloseButton.js");
+/* harmony import */ var _Menu__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./Menu */ "./js/Menu.js");
+
 
 
 
@@ -2250,61 +2304,12 @@ const animationBuffer = [];
 var app = new PIXI.Application(window.innerWidth, window.innerHeight, {backgroundColor : 0x000000});
 document.body.appendChild(app.view);
 
-const soundButton = new _SoundButton__WEBPACK_IMPORTED_MODULE_0__["SoundButton"]();
-const fullScreenButton = new _FullScreenButton__WEBPACK_IMPORTED_MODULE_1__["FullScreenButton"]();
-
 var prerenderCallbacks = [animate],
     lastTimeStepOccured = 0,
     currentStepTime = 0,
     currentTime = 0;
 
 lastTimeStepOccured = updateTime();
-
-if(!window.localStorage.getItem("itemsList")){
-    _StorageItemsManager__WEBPACK_IMPORTED_MODULE_2__["StorageManager"].initStorage();
-}
-
-var wheel = new _BonusWheel__WEBPACK_IMPORTED_MODULE_3__["BonusWheel"]({
-    name: "freespins",
-    spineSlot: "1st_back",
-    highlightSlot: "1st_back2",
-    sectors: [0,1,2,3,4,5,6,7,8,9,10,11],
-    maxSpeed: 16,
-    minSpeed: 0.15,
-    accelerationDuration: 1800,
-    minimumSpinsBeforeStop: 3,
-    sectorItemsList: _StorageItemsManager__WEBPACK_IMPORTED_MODULE_2__["StorageManager"].getSectorItemsList(),
-    image: "SYM8"
-}, function () {
-    menu.onStorageUpdated();
-}, app);
-window.wheel = wheel;
-
-// move the sprite to the center of the screen
-wheel.position.set(app.screen.width / 2, app.screen.height / 2);
-
-window.addEventListener("resize", function() {
-    app.renderer.resize(window.innerWidth, window.innerHeight);
-    wheel.position.set(window.innerWidth / 2, window.innerHeight / 2);
-});
-
-// Listen for animate update
-app.ticker.add(function(delta) {
-    prerenderCallbacks.forEach(function(cb) {
-        cb();
-    });
-});
-
-function animate(){
-    animationBuffer.forEach(function(holder){
-        if ( holder.running ){
-            holder.run({
-                timeStep: currentStepTime,
-                time: currentTime
-            });
-        }
-    });
-}
 
 function updateTime() {
     var now = Date.now(),
@@ -2321,23 +2326,59 @@ function updateTime() {
     return now;
 }
 
-app.stage.addChild(wheel);
+if(!window.localStorage.getItem("itemsList")) {
+    _StorageItemsManager__WEBPACK_IMPORTED_MODULE_3__["StorageManager"].initStorage();
+}
 
-var openCloseButton = new _OpenCloseButton__WEBPACK_IMPORTED_MODULE_4__["OpenCloseButton"]({
-    openCallback: function () {
-        menu.showMenu();
-    },
-    closeCallback: function () {
-        menu.hideMenu();
-    }
+function animate(){
+    animationBuffer.forEach(function(holder){
+        if ( holder.running ){
+            holder.run({
+                timeStep: currentStepTime,
+                time: currentTime
+            });
+        }
+    });
+}
+
+
+// Listen for animate update
+app.ticker.add(function(delta) {
+    prerenderCallbacks.forEach(function(cb) {
+        cb();
+    });
 });
 
-var menu = new _Menu__WEBPACK_IMPORTED_MODULE_5__["Menu"]();
 
+
+const menu = new _Menu__WEBPACK_IMPORTED_MODULE_6__["Menu"]();
+
+var wheel = new _BonusWheel__WEBPACK_IMPORTED_MODULE_4__["BonusWheel"](function () {
+    menu.onStorageUpdated();
+}, app);
+
+// move the sprite to the center of the screen
+wheel.position.set(app.screen.width / 2, app.screen.height / 2);
+
+window.addEventListener("resize", function() {
+    app.renderer.resize(window.innerWidth, window.innerHeight);
+    wheel.position.set(window.innerWidth / 2, window.innerHeight / 2);
+});
+
+
+
+const soundButton = new _SoundButton__WEBPACK_IMPORTED_MODULE_0__["SoundButton"]();
+const fullScreenButton = new _FullScreenButton__WEBPACK_IMPORTED_MODULE_2__["FullScreenButton"]();
+const openCloseButton = new _OpenCloseButton__WEBPACK_IMPORTED_MODULE_5__["OpenCloseButton"](menu);
+const resetButton = new _ResetButton__WEBPACK_IMPORTED_MODULE_1__["ResetButton"]();
+
+app.stage.addChild(wheel);
 app.stage.addChild(menu);
 app.stage.addChild(soundButton);
 app.stage.addChild(openCloseButton);
 app.stage.addChild(fullScreenButton);
+app.stage.addChild(resetButton);
+window.resetButton = resetButton;
 
 document.documentElement.webkitRequestFullscreen();
 
@@ -2347,7 +2388,7 @@ function refresh() {
     wheel.refresh();
 }
 
-function keyDownHandler(event) {
+document.addEventListener("keydown", function(event) {
     if(event.keyCode === 32){
         document.removeEventListener("keydown", keyDownHandler);
         wheel.onSpinButtonDown();
@@ -2356,12 +2397,7 @@ function keyDownHandler(event) {
             wheel.releaseHardButton(() => {document.addEventListener("keydown", keyDownHandler)});
         }, 300);
     }
-}
-
-document.addEventListener("keydown", keyDownHandler);
-
-window.storageManager = _StorageItemsManager__WEBPACK_IMPORTED_MODULE_2__["StorageManager"];
-
+});
 
 /***/ }),
 

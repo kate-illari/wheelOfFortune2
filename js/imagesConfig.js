@@ -24,4 +24,5 @@ export const imagesConfig = {
     SYM10_old: "assets/images/prizes/SYM10_old.png",
     SYM11_old: "assets/images/prizes/SYM11_old.png",
     SYM12_old: "assets/images/prizes/SYM12_old.png",
+    run: "assets/images/prizes/run.png",
 };

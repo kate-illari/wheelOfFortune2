@@ -29,21 +29,33 @@ const LOGO_POSITION = {
     }
 };
 
+const WHEEL_CONFIG = {
+    name: "freespins",
+    spineSlot: "1st_back",
+    highlightSlot: "1st_back2",
+    sectors: [0,1,2,3,4,5,6,7,8,9,10,11],
+    maxSpeed: 16,
+    minSpeed: 0.15,
+    accelerationDuration: 1800,
+    minimumSpinsBeforeStop: 3,
+    image: "SYM8"
+};
+
 export class BonusWheel extends PIXI.Container {
     
-    constructor (config, onStartBounceCompleteCallback, app) {
+    constructor (onStartBounceCompleteCallback, app) {
         super();
         var me = this;
 
-        me.sectorItemsList = config.sectorItemsList;
+        me.sectorItemsList = StorageManager.getSectorItemsList();
 
         me.background = me._initBackground();
         me.background.anchor.set(0.5,0.5);
 
         //degrees per frame
-        me.maxSpeed = config.maxSpeed;
+        me.maxSpeed = WHEEL_CONFIG.maxSpeed;
 
-        me.minSpeed = config.minSpeed;
+        me.minSpeed = WHEEL_CONFIG.minSpeed;
         me.wheelBgDisk = me.initWheelBackground();
 
         me.sprite = me._initWheelSprite();
@@ -52,12 +64,12 @@ export class BonusWheel extends PIXI.Container {
 
         BonusWheel.wheelItems = me._initWheelItems(me.sprite);
         //will be added to a separate spine slot:
-        me.highlightSprite = typeof config.image !== "undefined" ? me._initSprite(config.image, PIXI.BLEND_MODES.ADD) : me._initEmptySprite();
+        me.highlightSprite = typeof WHEEL_CONFIG.image !== "undefined" ? me._initSprite(WHEEL_CONFIG.image, PIXI.BLEND_MODES.ADD) : me._initEmptySprite();
 
-        me.sectorsAngles = me._mapSectorsAgles(config.sectors);
-        me.animations = me._initAnimations(config);
+        me.sectorsAngles = me._mapSectorsAgles(WHEEL_CONFIG.sectors);
+        me.animations = me._initAnimations(WHEEL_CONFIG);
         me.onStartBounceCompleteCallback = onStartBounceCompleteCallback;
-        me.config = config;
+        me.config = WHEEL_CONFIG;
         me.pick = me._initPickSprite();
 
         me.gift = me._initGiftSprite(me, "EMPTY");
@@ -191,7 +203,6 @@ export class BonusWheel extends PIXI.Container {
         var me = this,
             button = me.spinButton,
             itemsLeft = !StorageManager.isNoMoreItems(),
-            itemsList = StorageManager.getLocalStorageItem("itemsList"),
             sectorToStopOn;
 
         button.texture = PIXI.Texture.fromImage("assets/images/stop_idle.png");
@@ -511,7 +522,8 @@ export class BonusWheel extends PIXI.Container {
         this.onWheelStartCallback = callback;
         this.animations.accelerationTicker.play();
 
-
+        const winSound = this.winSound.cloneNode();
+        winSound.play();
     }
 
     startDeceleration (prevWheelStoppingDistance, onWheelStopped) {
@@ -600,8 +612,6 @@ export class BonusWheel extends PIXI.Container {
         console.warn(name);
         var me = this,
             gift = me.gift,
-            totalSectorsNum = me.sectorItemsList.length,
-            currentItemIndex = Math.round( totalSectorsNum / CIRCLE_DEG * me.stopAngle),
             currentWheelItem = BonusWheel.wheelItems[name];
 
         currentWheelItem.hide();
@@ -613,8 +623,6 @@ export class BonusWheel extends PIXI.Container {
             me._onWinAnimationComplete(gift);
             onEndCallback();
         };
-        const winSound = me.winSound.cloneNode();
-        winSound.play();
 
         gift.animation.play();
 
