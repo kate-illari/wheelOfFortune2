@@ -4,7 +4,7 @@ export class StorageManager{
     static initStorage () {
         window.localStorage.setItem("itemsList", JSON.stringify(
                 {
-                    SYM0: {count: 1, imgPath: "assets/images/prizes/backpack.png"},
+                    SYM0: {count: 1, imgPath: "assets/images/prizes/wild.png"},
                     SYM1: {count: 5, imgPath: "assets/images/prizes/bag.png"},
                     SYM2: {count: 5, imgPath: "assets/images/prizes/bottle.png"},
                     SYM3: {count: 5, imgPath: "assets/images/prizes/bag_laptop.png"},

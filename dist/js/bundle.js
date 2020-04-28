@@ -1555,6 +1555,9 @@ class BonusWheel extends PIXI.Container {
 
 }
 
+window.WHEEL = BonusWheel
+
+
 /***/ }),
 
 /***/ "./js/BonusWheelItem.js":
@@ -1684,7 +1687,12 @@ class Menu extends PIXI.Container{
         const imageSelectorContainer = this.createImageSelectorInterface();
         itemsListContainer.position.y = TOP_OFFSET;
 
-        const itemsList = _StorageItemsManager__WEBPACK_IMPORTED_MODULE_0__["StorageManager"].getLocalStorageItem("itemsList");
+        let itemsList = _StorageItemsManager__WEBPACK_IMPORTED_MODULE_0__["StorageManager"].getLocalStorageItem("itemsList");
+        if (typeof itemsList.SYM0 === "undefined"){
+            window.localStorage.clear();
+            _StorageItemsManager__WEBPACK_IMPORTED_MODULE_0__["StorageManager"].initStorage();
+            itemsList = _StorageItemsManager__WEBPACK_IMPORTED_MODULE_0__["StorageManager"].getLocalStorageItem("itemsList");
+        }
         Menu.itemGroups = this.createItemsListInterface(itemsList, itemsListContainer);
 
         this.addChild(itemsListContainer);
@@ -1880,6 +1888,7 @@ class Menu extends PIXI.Container{
     }
 }
 
+
 /***/ }),
 
 /***/ "./js/OpenCloseButton.js":
@@ -2065,7 +2074,7 @@ class StorageManager{
     static initStorage () {
         window.localStorage.setItem("itemsList", JSON.stringify(
                 {
-                    SYM0: {count: 1, imgPath: "assets/images/prizes/backpack.png"},
+                    SYM0: {count: 1, imgPath: "assets/images/prizes/wild.png"},
                     SYM1: {count: 5, imgPath: "assets/images/prizes/bag.png"},
                     SYM2: {count: 5, imgPath: "assets/images/prizes/bottle.png"},
                     SYM3: {count: 5, imgPath: "assets/images/prizes/bag_laptop.png"},

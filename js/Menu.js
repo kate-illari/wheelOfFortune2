@@ -12,7 +12,12 @@ export class Menu extends PIXI.Container{
         const imageSelectorContainer = this.createImageSelectorInterface();
         itemsListContainer.position.y = TOP_OFFSET;
 
-        const itemsList = StorageManager.getLocalStorageItem("itemsList");
+        let itemsList = StorageManager.getLocalStorageItem("itemsList");
+        if (typeof itemsList.SYM0 === "undefined"){
+            window.localStorage.clear();
+            StorageManager.initStorage();
+            itemsList = StorageManager.getLocalStorageItem("itemsList");
+        }
         Menu.itemGroups = this.createItemsListInterface(itemsList, itemsListContainer);
 
         this.addChild(itemsListContainer);

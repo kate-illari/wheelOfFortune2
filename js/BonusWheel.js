@@ -676,3 +676,5 @@ export class BonusWheel extends PIXI.Container {
     }
 
 }
+
+window.WHEEL = BonusWheel
