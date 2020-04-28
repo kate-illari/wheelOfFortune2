@@ -88,7 +88,7 @@ export class Menu extends PIXI.Container{
     }
 
     onNewImgSelected(imagePath){
-        this.targetSprite.setTexture(new PIXI.Texture.from(imagePath));
+        this.targetSprite.texture = new PIXI.Texture.from(imagePath);
         StorageManager.setNewImgPath(this.targetName, imagePath);
     }
 

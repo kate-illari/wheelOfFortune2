@@ -1,3 +1,12 @@
+const WHEEL_ITEM_CONFIG = {
+    width: 110,
+    height: 110
+};
+const WILD_ITEM_CONFIG = {
+    width: 150,
+    height: 150,
+}
+
 export class BonusWheelItem extends PIXI.Sprite {
     /**
      *
@@ -15,6 +24,7 @@ export class BonusWheelItem extends PIXI.Sprite {
         this.anchor.set(0.5);
         this.scale.set(config.scale);
         this.updatePositionAndRotation(config.totalSectorsNum, config.sectorIndex, config.centerOffset);
+        this.updateSize();
     }
 
     /**
@@ -41,5 +51,17 @@ export class BonusWheelItem extends PIXI.Sprite {
 
     show(){
         this.visible = true;
+    }
+
+    updateSize() {
+        const wildSubstr = RegExp("wild");
+        const isWild = wildSubstr.test(this.texture.baseTexture.imageUrl);
+        if(isWild){
+            this.width = WILD_ITEM_CONFIG.width;
+            this.height = WILD_ITEM_CONFIG.height;
+        } else {
+            this.width = WHEEL_ITEM_CONFIG.width;
+            this.height = WHEEL_ITEM_CONFIG.height;
+        }
     }
 }

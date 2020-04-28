@@ -17,6 +17,10 @@ const WHEEL_ITEM_CONFIG = {
     width: 110,
     height: 110
 };
+const WILD_ITEM_CONFIG = {
+    width: 150,
+    height: 150,
+}
 
 const LOGO_POSITION = {
     portrait: {
@@ -236,23 +240,22 @@ export class BonusWheel extends PIXI.Container {
      */
     _initWheelItems(parent){
         var me = this,
-            sizedContainer,
-            bonusWheelItem,
             whellItems = {};
 
         me.sectorItemsList.forEach(function (item, index) {
-            sizedContainer = new PIXI.Container();
+            const texturePath = StorageManager.getImgPath(item);
+            const texture = new PIXI.Texture.fromImage(texturePath);
+            const sizedContainer = new PIXI.Container();
 
-            bonusWheelItem = new BonusWheelItem({
+            const bonusWheelItem = new BonusWheelItem({
                 parent: sizedContainer,
-                texture: new PIXI.Texture.fromImage(StorageManager.getImgPath(item)),
+                texture: texture,
                 sectorIndex: index,
                 centerOffset: WHEEL_ITEMS_CENTER_OFFSET,
                 totalSectorsNum: me.sectorItemsList.length
             });
 
-            bonusWheelItem.width = WHEEL_ITEM_CONFIG.width;
-            bonusWheelItem.height = WHEEL_ITEM_CONFIG.height;
+            bonusWheelItem.updateSize();
 
             parent.addChild(sizedContainer);
             whellItems[item] = bonusWheelItem;
@@ -270,11 +273,15 @@ export class BonusWheel extends PIXI.Container {
     }
 
     _initGiftSprite (container, imageName) {
-        var sprite = this._initSprite(imageName, PIXI.BLEND_MODES.NORMAL);
+        const sprite = this._initSprite(imageName, PIXI.BLEND_MODES.NORMAL);
+        const wildSubstr = RegExp("wild");
+        const isWild = wildSubstr.test(sprite.texture.baseTexture.imageUrl);
+        const startWidth = isWild ? WILD_ITEM_CONFIG.width : WHEEL_ITEM_CONFIG.width;
+        const startHeight = isWild ? WILD_ITEM_CONFIG.height : WHEEL_ITEM_CONFIG.height;
 
         container.addChild(sprite);
-        sprite.width = 120;
-        sprite.height = 120;
+        sprite.width = startWidth;
+        sprite.height = startHeight;
         sprite.position.y = -WHEEL_ITEMS_CENTER_OFFSET/2;
         sprite.visible = false;
         sprite.animation = new AnimationHolder({
@@ -293,19 +300,19 @@ export class BonusWheel extends PIXI.Container {
                 {
                     prop: "width",
                     animate: {
-                        200: 110,
-                        1500: WHEEL_ITEM_CONFIG.width * 4,
-                        5000: WHEEL_ITEM_CONFIG.width * 4,
-                        5500: 110
+                        200: startWidth,
+                        1500: startWidth * 4,
+                        5000: startWidth * 4,
+                        5500: startWidth
                     }
                 },
                 {
                     prop: "height",
                     animate: {
-                        200: 110,
-                        1500: WHEEL_ITEM_CONFIG.height * 4,
-                        5000: WHEEL_ITEM_CONFIG.height * 4,
-                        5500: 110
+                        200: startHeight,
+                        1500: startHeight * 4,
+                        5000: startHeight * 4,
+                        5500: startHeight
                     }
                 }
             ]
@@ -659,7 +666,9 @@ export class BonusWheel extends PIXI.Container {
     }
 
     static changeTexture(name, texture){
+        const wildSubstr = RegExp("wild");
         BonusWheel.wheelItems[name].texture = texture;
+        BonusWheel.wheelItems[name].updateSize();
     }
 
     refresh () {
@@ -674,7 +683,6 @@ export class BonusWheel extends PIXI.Container {
         }
 
     }
-
 }
 
 window.WHEEL = BonusWheel
