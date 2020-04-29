@@ -1,5 +1,5 @@
 import {StorageManager} from "./StorageItemsManager";
-import {imagesConfig} from "./imagesConfig";
+import {galleryConfig} from "./galleryConfig";
 
 const OFFSET = 10;
 const TOP_OFFSET = 80;
@@ -9,7 +9,7 @@ export class Menu extends PIXI.Container{
         super();
 
         const itemsListContainer = new PIXI.Container();
-        const imageSelectorContainer = this.createImageSelectorInterface();
+        const gallery = this.createGalleryInterface();
         itemsListContainer.position.y = TOP_OFFSET;
 
         let itemsList = StorageManager.getLocalStorageItem("itemsList");
@@ -21,11 +21,11 @@ export class Menu extends PIXI.Container{
         Menu.itemGroups = this.createItemsListInterface(itemsList, itemsListContainer);
 
         this.addChild(itemsListContainer);
-        this.addChild(imageSelectorContainer);
+        this.addChild(gallery);
 
         this.hideMenu();
-        imageSelectorContainer.visible = false;
-        this.imageSelectorContainer = imageSelectorContainer;
+        gallery.visible = false;
+        this.gallery = gallery;
     }
 
     onStorageUpdated () {
@@ -61,20 +61,20 @@ export class Menu extends PIXI.Container{
         return itemGroups;
     }
 
-    createImageSelectorInterface () {
+    createGalleryInterface () {
         const container = new PIXI.Container();
         const me = this;
         container.position.set(200, TOP_OFFSET);
 
         PIXI.loader
             .load(
-                Object.values(imagesConfig).forEach(function (imagePath, imageIndex) {
+                Object.values(galleryConfig).forEach(function (imagePath, imageIndex) {
                     const texture = new PIXI.Texture.from(imagePath);
                     const itemImage = new PIXI.Sprite(texture);
 
                     itemImage.height = 28;
                     itemImage.width = 28;
-                    itemImage.position.set(0, 28 * imageIndex);
+                    itemImage.position.set(0, (28 * imageIndex) + (10 * imageIndex));
                     itemImage.interactive = true;
                     itemImage.buttonMode = true;
                     itemImage.on('pointerdown', me.onNewImgSelected.bind(me, imagePath));
@@ -207,8 +207,15 @@ export class Menu extends PIXI.Container{
     }
 
     onItemClick (targetSprite, targetName) {
+        if(targetName === this.targetName && this.isOpen){
+            this.gallery.visible = false;
+            this.isOpen = false;
+        } else {
+            this.gallery.visible = true;
+            this.isOpen = true;
+        }
+
         this.targetSprite = targetSprite;
         this.targetName = targetName;
-        this.imageSelectorContainer.visible = !this.imageSelectorContainer.visible;
     }
 }

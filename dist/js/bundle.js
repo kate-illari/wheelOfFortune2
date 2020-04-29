@@ -1703,7 +1703,7 @@ class FullScreenButton extends PIXI.Sprite {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Menu", function() { return Menu; });
 /* harmony import */ var _StorageItemsManager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./StorageItemsManager */ "./js/StorageItemsManager.js");
-/* harmony import */ var _imagesConfig__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./imagesConfig */ "./js/imagesConfig.js");
+/* harmony import */ var _galleryConfig__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./galleryConfig */ "./js/galleryConfig.js");
 
 
 
@@ -1715,7 +1715,7 @@ class Menu extends PIXI.Container{
         super();
 
         const itemsListContainer = new PIXI.Container();
-        const imageSelectorContainer = this.createImageSelectorInterface();
+        const gallery = this.createGalleryInterface();
         itemsListContainer.position.y = TOP_OFFSET;
 
         let itemsList = _StorageItemsManager__WEBPACK_IMPORTED_MODULE_0__["StorageManager"].getLocalStorageItem("itemsList");
@@ -1727,11 +1727,11 @@ class Menu extends PIXI.Container{
         Menu.itemGroups = this.createItemsListInterface(itemsList, itemsListContainer);
 
         this.addChild(itemsListContainer);
-        this.addChild(imageSelectorContainer);
+        this.addChild(gallery);
 
         this.hideMenu();
-        imageSelectorContainer.visible = false;
-        this.imageSelectorContainer = imageSelectorContainer;
+        gallery.visible = false;
+        this.gallery = gallery;
     }
 
     onStorageUpdated () {
@@ -1767,20 +1767,20 @@ class Menu extends PIXI.Container{
         return itemGroups;
     }
 
-    createImageSelectorInterface () {
+    createGalleryInterface () {
         const container = new PIXI.Container();
         const me = this;
         container.position.set(200, TOP_OFFSET);
 
         PIXI.loader
             .load(
-                Object.values(_imagesConfig__WEBPACK_IMPORTED_MODULE_1__["imagesConfig"]).forEach(function (imagePath, imageIndex) {
+                Object.values(_galleryConfig__WEBPACK_IMPORTED_MODULE_1__["galleryConfig"]).forEach(function (imagePath, imageIndex) {
                     const texture = new PIXI.Texture.from(imagePath);
                     const itemImage = new PIXI.Sprite(texture);
 
                     itemImage.height = 28;
                     itemImage.width = 28;
-                    itemImage.position.set(0, 28 * imageIndex);
+                    itemImage.position.set(0, (28 * imageIndex) + (10 * imageIndex));
                     itemImage.interactive = true;
                     itemImage.buttonMode = true;
                     itemImage.on('pointerdown', me.onNewImgSelected.bind(me, imagePath));
@@ -1913,9 +1913,16 @@ class Menu extends PIXI.Container{
     }
 
     onItemClick (targetSprite, targetName) {
+        if(targetName === this.targetName && this.isOpen){
+            this.gallery.visible = false;
+            this.isOpen = false;
+        } else {
+            this.gallery.visible = true;
+            this.isOpen = true;
+        }
+
         this.targetSprite = targetSprite;
         this.targetName = targetName;
-        this.imageSelectorContainer.visible = !this.imageSelectorContainer.visible;
     }
 }
 
@@ -2106,17 +2113,17 @@ class StorageManager{
         window.localStorage.setItem("itemsList", JSON.stringify(
                 {
                     SYM0: {count: 1, imgPath: "assets/images/prizes/wild.png"},
-                    SYM1: {count: 5, imgPath: "assets/images/prizes/bag.png"},
-                    SYM2: {count: 5, imgPath: "assets/images/prizes/bottle.png"},
-                    SYM3: {count: 5, imgPath: "assets/images/prizes/bag_laptop.png"},
-                    SYM4: {count: 5, imgPath: "assets/images/prizes/certificate.png"},
-                    SYM5: {count: 5, imgPath: "assets/images/prizes/fly.png"},
-                    SYM6: {count: 5, imgPath: "assets/images/prizes/memory_card.png"},
-                    SYM7: {count: 5, imgPath: "assets/images/prizes/pen.png"},
-                    SYM8: {count: 5, imgPath: "assets/images/prizes/notebook.png"},
-                    SYM9: {count: 5, imgPath: "assets/images/prizes/pendant.png"},
-                    SYM10: {count: 7, imgPath: "assets/images/prizes/phone_cover.png"},
-                    SYM11: {count: 5, imgPath: "assets/images/prizes/powerbank.png"},
+                    SYM1: {count: 1, imgPath: "assets/images/prizes/merch.png"},
+                    SYM2: {count: 1, imgPath: "assets/images/prizes/bottle.png"},
+                    SYM3: {count: 1, imgPath: "assets/images/prizes/backpack.png"},
+                    SYM4: {count: 1, imgPath: "assets/images/prizes/wild.png"},
+                    SYM5: {count: 2, imgPath: "assets/images/prizes/towel.png"},
+                    SYM6: {count: 2, imgPath: "assets/images/prizes/powerbank.png"},
+                    SYM7: {count: 1, imgPath: "assets/images/prizes/merch.png"},
+                    SYM8: {count: 1, imgPath: "assets/images/prizes/wild.png"},
+                    SYM9: {count: 1, imgPath: "assets/images/prizes/run.png"},
+                    SYM10: {count: 1, imgPath: "assets/images/prizes/merch.png"},
+                    SYM11: {count: 2, imgPath: "assets/images/prizes/powerbank.png"},
                 }
             )
         );
@@ -2273,44 +2280,24 @@ window.test = StorageManager;
 
 /***/ }),
 
-/***/ "./js/imagesConfig.js":
-/*!****************************!*\
-  !*** ./js/imagesConfig.js ***!
-  \****************************/
-/*! exports provided: imagesConfig */
+/***/ "./js/galleryConfig.js":
+/*!*****************************!*\
+  !*** ./js/galleryConfig.js ***!
+  \*****************************/
+/*! exports provided: galleryConfig */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "imagesConfig", function() { return imagesConfig; });
-const imagesConfig = {
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "galleryConfig", function() { return galleryConfig; });
+const galleryConfig = {
     backpack: "assets/images/prizes/backpack.png",
-    bag_laptop: "assets/images/prizes/bag_laptop.png",
-    bag: "assets/images/prizes/bag.png",
     bottle: "assets/images/prizes/bottle.png",
-    certificate: "assets/images/prizes/certificate.png",
-    fly: "assets/images/prizes/fly.png",
-    memory_card: "assets/images/prizes/memory_card.png",
-    notebook: "assets/images/prizes/notebook.png",
-    pen: "assets/images/prizes/pen.png",
-    pendant: "assets/images/prizes/pendant.png",
-    phone_cover: "assets/images/prizes/phone_cover.png",
     powerbank: "assets/images/prizes/powerbank.png",
-    signal: "assets/images/prizes/signal.png",
-    towel: "assets/images/prizes/towel.png",
-    SYM1_old: "assets/images/prizes/SYM1_old.png",
-    SYM2_old: "assets/images/prizes/SYM2_old.png",
-    SYM3_old: "assets/images/prizes/SYM3_old.png",
-    SYM4_old: "assets/images/prizes/SYM4_old.png",
-    SYM5_old: "assets/images/prizes/SYM5_old.png",
-    SYM7_old: "assets/images/prizes/SYM7_old.png",
-    SYM8_old: "assets/images/prizes/SYM8_old.png",
-    SYM9_old: "assets/images/prizes/SYM9_old.png",
-    SYM10_old: "assets/images/prizes/SYM10_old.png",
-    SYM11_old: "assets/images/prizes/SYM11_old.png",
-    SYM12_old: "assets/images/prizes/SYM12_old.png",
     run: "assets/images/prizes/run.png",
     wild: "assets/images/prizes/wild.png",
+    towel: "assets/images/prizes/towel.png",
+    merch: "assets/images/prizes/merch.png",
 };
 
 

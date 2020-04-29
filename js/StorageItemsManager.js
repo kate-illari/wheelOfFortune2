@@ -5,17 +5,17 @@ export class StorageManager{
         window.localStorage.setItem("itemsList", JSON.stringify(
                 {
                     SYM0: {count: 1, imgPath: "assets/images/prizes/wild.png"},
-                    SYM1: {count: 5, imgPath: "assets/images/prizes/bag.png"},
-                    SYM2: {count: 5, imgPath: "assets/images/prizes/bottle.png"},
-                    SYM3: {count: 5, imgPath: "assets/images/prizes/bag_laptop.png"},
-                    SYM4: {count: 5, imgPath: "assets/images/prizes/certificate.png"},
-                    SYM5: {count: 5, imgPath: "assets/images/prizes/fly.png"},
-                    SYM6: {count: 5, imgPath: "assets/images/prizes/memory_card.png"},
-                    SYM7: {count: 5, imgPath: "assets/images/prizes/pen.png"},
-                    SYM8: {count: 5, imgPath: "assets/images/prizes/notebook.png"},
-                    SYM9: {count: 5, imgPath: "assets/images/prizes/pendant.png"},
-                    SYM10: {count: 7, imgPath: "assets/images/prizes/phone_cover.png"},
-                    SYM11: {count: 5, imgPath: "assets/images/prizes/powerbank.png"},
+                    SYM1: {count: 1, imgPath: "assets/images/prizes/merch.png"},
+                    SYM2: {count: 1, imgPath: "assets/images/prizes/bottle.png"},
+                    SYM3: {count: 1, imgPath: "assets/images/prizes/backpack.png"},
+                    SYM4: {count: 1, imgPath: "assets/images/prizes/wild.png"},
+                    SYM5: {count: 2, imgPath: "assets/images/prizes/towel.png"},
+                    SYM6: {count: 2, imgPath: "assets/images/prizes/powerbank.png"},
+                    SYM7: {count: 1, imgPath: "assets/images/prizes/merch.png"},
+                    SYM8: {count: 1, imgPath: "assets/images/prizes/wild.png"},
+                    SYM9: {count: 1, imgPath: "assets/images/prizes/run.png"},
+                    SYM10: {count: 1, imgPath: "assets/images/prizes/merch.png"},
+                    SYM11: {count: 2, imgPath: "assets/images/prizes/powerbank.png"},
                 }
             )
         );
